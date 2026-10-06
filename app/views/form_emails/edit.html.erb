@@ -74,5 +74,5 @@
   </aside>
 <% end %>
 <%= form_with url: form_email_test_path(form_slug: @form.slug, email_kind: @email.kind), id: "form_email_test_form", hidden: true do %><% end %>
-<%= render "content_form/asset_picker" %>
+<%= plugin_slots(:content_form) %>
 <%= render "content_form/postbox_state" %>
