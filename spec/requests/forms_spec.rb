@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-# The Forms plugin (engines/forms): the admin screens, and what disappears
+# The Forms plugin (cms-plugins/forms): the admin screens, and what disappears
 # when it's switched off. The API is covered by spec/requests/api/*.
 RSpec.describe "The Forms plugin", type: :request do
   let(:admin) { create(:user) }
@@ -245,7 +245,7 @@ RSpec.describe "The Forms plugin", type: :request do
     end
 
     it "moves plain secrets into the encrypted ones when migrated" do
-      require Rails.root.join("engines/forms/db/migrate/20260928090000_encrypt_form_captcha_secrets")
+      require Forms::Engine.root.join("db/migrate/20260928090000_encrypt_form_captcha_secrets")
       Setting.set("forms_settings", {"from_name" => "Mill", "turnstile_secret_key" => "plain", "recaptcha_secret_key" => ""})
 
       EncryptFormCaptchaSecrets.new.up
