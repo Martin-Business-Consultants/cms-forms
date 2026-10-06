@@ -16,6 +16,16 @@ module Forms
   # A captcha secret key: from the setting's encrypted `secrets`, or the plain
   # value an install saved before they were encrypted (the
   # EncryptFormCaptchaSecrets migration moves those).
+  # The spam protection a site shows on its forms: the provider and its
+  # public site key ({provider: "turnstile", site_key: "0x4…"}), or nil when
+  # none is set up with both its keys. Never the secret.
+  def self.public_captcha
+    settings = Setting.get(SETTING_KEY)
+    provider = settings["captcha_provider"].presence_in(%w[turnstile recaptcha]) or return nil
+    site_key = settings["#{provider}_site_key"].presence
+    {provider: provider, site_key: site_key} if site_key && captcha_secret("#{provider}_secret_key").present?
+  end
+
   def self.captcha_secret(name)
     Setting.secret(SETTING_KEY, name) || Setting.get(SETTING_KEY)[name.to_s].to_s.strip.presence
   end

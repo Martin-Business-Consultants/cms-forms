@@ -50,9 +50,14 @@ module Forms
 
           # Public write path (unauthenticated, CORS) vs. authenticated inbox —
           # different controllers on purpose, see Api::SubmissionsController.
-          post    "forms/:form_slug/submissions", to: "form_submissions#create"
+          post    "forms/:form_slug/submissions", to: "form_submissions#create", as: :form_submissions
           options "forms/:form_slug/submissions", to: "form_submissions#options"
           get     "forms/:form_slug/submissions", to: "submissions#index"
+
+          # The delivery API's read of the published forms (Api::V1::FormsController).
+          namespace :v1 do
+            resources :forms, param: :slug, only: [:index, :show]
+          end
 
           post "submissions/bulk_destroy", to: "submissions/bulk_deletions#create", as: :bulk_destroy_submissions
           resources :submissions, only: [:index, :show, :destroy]
@@ -105,6 +110,8 @@ module Forms
       Cms::Plugins.manifest_section :forms, :forms, -> { Form.ordered.map(&:manifest_entry) }, after: :collections
       Cms::Plugins.trashable :forms, "form", "Form", label: "Forms", after: "entry",
         meta: ->(form) { {status: form.status, slug: form.slug} }
+      # What /api/v1/site tells a build about forms.
+      Cms::Plugins.provide :forms, :site_config, -> { {forms: {captcha: Forms.public_captcha}} }
       Cms::Plugins.provide :forms, :published_forms, -> { Form.where(status: "published").order(:title).to_a }
       # For Site Health: which spam protection the forms use, and whether it has both its keys.
       Cms::Plugins.provide :forms, :spam_protection, -> {
@@ -119,6 +126,7 @@ module Forms
         permit: FormWebhookFilter.method(:permit), validate: FormWebhookFilter.method(:validate),
         match: FormWebhookFilter.method(:match)
 
+      Cms::Plugins.api :forms, "/api/v1/forms", description: "The published forms as a site renders them: fields, where to post, captcha site key."
       Cms::Plugins.api :forms, "/api/forms", description: "Every form, with its fields; create and update them."
       Cms::Plugins.api :forms, "/api/forms/:slug/submissions", description: "Where the site posts a submission (public, CORS)."
       Cms::Plugins.api :forms, "/api/forms/:slug/emails/:kind/template",
