@@ -14,7 +14,7 @@ module FormsHelper
   # [group, [[type, label, icon], …]].
   FIELD_PALETTE = [
     ["Standard fields", [%w[text rename], %w[textarea document], %w[select caret-down], %w[radio check-circle], %w[checkbox check]]],
-    ["Advanced fields", [%w[email email], %w[tel mobile-only], %w[url link], %w[file attachment]]]
+    ["Advanced fields", [%w[email email], %w[tel comment], %w[url link], %w[file attachment]]]
   ].freeze
 
   def form_field_palette

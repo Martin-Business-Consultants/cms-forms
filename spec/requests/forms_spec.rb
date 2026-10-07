@@ -50,15 +50,15 @@ RSpec.describe "The Forms plugin", type: :request do
       expect(copy.notification_email).to have_attributes(enabled: true, subject: "New one", recipients: "team@b.test")
     end
 
-    it "draws the builder: a card per field on the canvas, their settings in the panel" do
+    it "draws the builder: a row per field, their settings in the sheet, the palette" do
       form = make_form
 
       get edit_form_path(form.slug)
 
       doc = Nokogiri::HTML(response.body)
-      expect(doc.css(".form-canvas > .form-card").size).to eq 1
-      expect(doc.css(".form-panel .form-settings[data-key='f0']")).to be_present
-      expect(doc.css(".form-palette__item").map { it["data-type"] }).to match_array(FormValidator::FIELD_TYPES)
+      expect(doc.css("[data-forms--builder-target=canvas] > .form-card").size).to eq 1
+      expect(doc.css("dialog.form-panel .form-settings[data-key='f0']")).to be_present
+      expect(doc.css("[data-action~='forms--builder#add']").map { it["data-type"] }).to match_array(FormValidator::FIELD_TYPES)
     end
 
     it "creates a form from a template, filling in what was left blank" do

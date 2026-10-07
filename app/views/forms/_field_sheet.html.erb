@@ -1,0 +1,41 @@
+<%# locals: (form:) %>
+<%# The picked field's settings, in a sheet as Payload edits a block in a
+    drawer: one block per field (forms/_field_settings), all posted, the
+    picked one shown, split as Gravity Forms splits them: General, Appearance,
+    Advanced. The builder opens it (its dialog outlet) when a field is picked;
+    closing it unpicks the field. %>
+<% fields = Array(form.fields).map { it.is_a?(Hash) ? it : {} } %>
+<div id="form_field_sheet" class="contents" data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
+  <dialog class="<%= ui(:sheet, "form-panel") %>" data-dialog-target="dialog" data-forms--builder-target="panel" data-tab="general"
+          aria-label="Field settings" closedby="any" data-action="close->forms--builder#unpick">
+    <header class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <h2 class="text-lg font-semibold text-gray-900">Field settings</h2>
+        <p class="truncate text-sm text-gray-500" data-forms--builder-target="sheetTitle"></p>
+      </div>
+      <button type="button" class="<%= ui(:button, :plain, :small) %>" data-action="dialog#close">Close</button>
+    </header>
+
+    <div class="flex gap-4 border-b border-gray-200" role="tablist">
+      <% [ [ "general", "General" ], [ "appearance", "Appearance" ], [ "advanced", "Advanced" ] ].each do |tab, label| %>
+        <%# herb:key tab %>
+        <button type="button" class="form-panel__subtab -mb-px border-b-2 py-2 text-sm font-medium" role="tab" data-tab="<%= tab %>" data-action="forms--builder#showTab"><%= label %></button>
+      <% end %>
+    </div>
+
+    <div data-forms--builder-target="settingsList">
+      <% fields.each_with_index do |field, index| %>
+        <%# herb:key index %>
+        <%= render "forms/field_settings", field: field, key: "f" + index.to_s %>
+      <% end %>
+    </div>
+
+    <div class="dialog__actions flex justify-end gap-2">
+      <button type="button" class="<%= ui(:button, :primary) %>" data-action="dialog#close">Done</button>
+    </div>
+
+    <template data-forms--builder-target="settingsTemplate">
+      <%= render "forms/field_settings", field: { "type" => "text" }, key: "__KEY__" %>
+    </template>
+  </dialog>
+</div>

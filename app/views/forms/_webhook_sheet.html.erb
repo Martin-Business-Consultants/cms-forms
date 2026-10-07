@@ -4,72 +4,81 @@
     only the keys mapped here (FormWebhookBody). Its inputs belong to the
     form editor, so they save with it. %>
 <% body = FormWebhookBody.new(record) %>
-<div class="display-contents" data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
-  <div class="webhook-summary">
-    <span class="flex flex-column min-width-0">
-      <span class="txt-small font-weight-bold">Webhook</span>
+<% choice_classes = "flex items-start gap-3 rounded-lg border border-gray-200 px-3 py-2.5 text-sm hover:bg-gray-50" %>
+<div data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
+  <div class="flex items-center justify-between gap-4">
+    <span class="flex min-w-0 flex-col gap-0.5">
+      <span class="<%= ui(:label) %>">Webhook</span>
       <% if record.notify_webhook_url.present? %>
-        <code class="txt-x-small overflow-ellipsis"><%= record.notify_webhook_url %></code>
-        <span class="txt-x-small txt-subtle"><%= body.mapped? ? pluralize(body.mappings.size, "mapped key") : "Sends every field" %></span>
+        <code class="truncate font-mono text-xs text-gray-700"><%= record.notify_webhook_url %></code>
+        <span class="<%= ui(:help) %>"><%= body.mapped? ? pluralize(body.mappings.size, "mapped key") : "Sends every field" %></span>
       <% else %>
-        <span class="txt-x-small txt-subtle">Not set up. Each submission can also be posted to a URL.</span>
+        <span class="<%= ui(:help) %>">Not set up. Each submission can also be posted to a URL.</span>
       <% end %>
     </span>
-    <button type="button" class="btn txt-small" data-action="dialog#open"><%= record.notify_webhook_url.present? ? "Edit" : "Set up" %></button>
+    <button type="button" class="<%= ui(:button, :small, "shrink-0") %>" data-action="dialog#open"><%= record.notify_webhook_url.present? ? "Edit" : "Set up" %></button>
   </div>
 
-  <dialog class="dialog dialog--sheet dialog--sheet-half panel fill-white shadow gap flex-column txt-align-start webhook-sheet"
-          data-dialog-target="dialog" aria-label="Webhook" closedby="any">
-    <header class="flex align-center justify-space-between gap">
-      <h2 class="txt-large font-weight-bold margin-none">Webhook</h2>
-      <button type="button" class="btn txt-small" data-action="dialog#close">Close</button>
+  <dialog class="<%= ui(:sheet, "dialog--sheet-half webhook-sheet") %>" data-dialog-target="dialog" aria-label="Webhook" closedby="any">
+    <header class="flex items-center justify-between gap-4">
+      <h2 class="text-lg font-semibold text-gray-900">Webhook</h2>
+      <button type="button" class="<%= ui(:button, :plain, :small) %>" data-action="dialog#close">Close</button>
     </header>
 
     <%= settings_field "Request URL", hint: "Each submission is posted here as JSON." do %>
-      <%= form.url_field :notify_webhook_url, class: "input full-width font-mono", placeholder: "https://hooks.example.com/forms" %>
+      <%= form.url_field :notify_webhook_url, class: "w-full font-mono", placeholder: "https://hooks.example.com/forms" %>
     <% end %>
 
-    <fieldset class="webhook-sheet__mode">
-      <legend class="txt-small font-weight-bold">Request body</legend>
-      <label class="webhook-sheet__choice">
-        <%= radio_button_tag "form[webhook_body][mode]", "all", !body.mapped?, id: nil %>
-        <span><strong>All fields</strong> <span class="txt-x-small txt-subtle">The whole submission: the form, every answer, files, IP and time.</span></span>
+    <fieldset class="flex flex-col gap-2">
+      <legend class="<%= ui(:label, "mb-2") %>">Request body</legend>
+      <label class="<%= choice_classes %>">
+        <%= radio_button_tag "form[webhook_body][mode]", "all", !body.mapped?, id: nil, class: "mt-0.5" %>
+        <span class="flex flex-col">
+          <strong class="font-medium text-gray-900">All fields</strong>
+          <span class="<%= ui(:help) %>">The whole submission: the form, every answer, files, IP and time.</span>
+        </span>
       </label>
-      <label class="webhook-sheet__choice">
-        <%= radio_button_tag "form[webhook_body][mode]", "fields", body.mapped?, id: nil %>
-        <span><strong>Select fields</strong> <span class="txt-x-small txt-subtle">Only the keys below, each set to a form value or a custom one.</span></span>
+      <label class="<%= choice_classes %>">
+        <%= radio_button_tag "form[webhook_body][mode]", "fields", body.mapped?, id: nil, class: "mt-0.5" %>
+        <span class="flex flex-col">
+          <strong class="font-medium text-gray-900">Select fields</strong>
+          <span class="<%= ui(:help) %>">Only the keys below, each set to a form value or a custom one.</span>
+        </span>
       </label>
     </fieldset>
 
-    <section class="webhook-map" data-controller="sortable-list" data-sortable-list-token-value="__ROW__">
-      <div class="webhook-map__head txt-x-small font-weight-bold" aria-hidden="true">
-        <span>Key</span>
-        <span>Value</span>
+    <section class="webhook-map space-y-3" data-controller="sortable-list" data-sortable-list-token-value="__ROW__">
+      <div class="hidden items-center gap-2 text-xs font-medium text-gray-500 sm:flex" aria-hidden="true">
+        <span class="grid min-w-0 flex-1 grid-cols-3 gap-2">
+          <span>Key</span>
+          <span class="col-span-2">Value</span>
+        </span>
+        <span class="w-8 shrink-0"></span>
       </div>
-      <ol class="webhook-map__rows" data-sortable-list-target="list">
+      <ol class="flex flex-col gap-2" data-sortable-list-target="list">
         <% body.mappings.each_with_index do |mapping, index| %>
           <%# herb:key index %>
           <%= render "forms/webhook_mapping", mapping: mapping, key: "m" + index.to_s, record: record %>
         <% end %>
       </ol>
       <div>
-        <button type="button" class="btn txt-small" data-action="sortable-list#add">
-          <%= icon_tag "add" %>
+        <button type="button" class="<%= ui(:button, :small) %>" data-action="sortable-list#add">
+          <%= icon_tag "add", class: "size-4" %>
           <span>Add key</span>
         </button>
       </div>
-      <p class="txt-x-small txt-subtle margin-none">
-        A custom value can take <code>{{form_title}}</code>, <code>{{submission_id}}</code>, <code>{{submitted_at}}</code>,
-        <code>{{ip}}</code> or a field’s name, as <code>{{email}}</code>. The fields offered are the form’s as last saved.
+      <p class="<%= ui(:help) %>">
+        A custom value can take <code class="font-mono">{{form_title}}</code>, <code class="font-mono">{{submission_id}}</code>, <code class="font-mono">{{submitted_at}}</code>,
+        <code class="font-mono">{{ip}}</code> or a field’s name, as <code class="font-mono">{{email}}</code>. The fields offered are the form’s as last saved.
       </p>
       <template data-sortable-list-target="template">
         <%= render "forms/webhook_mapping", mapping: {}, key: "__ROW__", record: record %>
       </template>
     </section>
 
-    <div class="dialog__actions flex gap-half justify-end">
-      <button type="button" class="btn" data-action="dialog#close">Close</button>
-      <%= form.button "Save", class: "btn btn--link" %>
+    <div class="dialog__actions flex justify-end gap-2">
+      <button type="button" class="<%= ui(:button) %>" data-action="dialog#close">Close</button>
+      <%= form.button "Save", class: ui(:button, :primary) %>
     </div>
   </dialog>
 </div>

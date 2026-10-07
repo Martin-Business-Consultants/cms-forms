@@ -3,7 +3,7 @@
     form takes submissions), off a draft. It posts as soon as it's flipped. %>
 <% active = form.status == "published" %>
 <% if can_write %>
-  <%= form_with url: form_activation_path(form.slug), method: :patch, class: "display-contents", data: { controller: "form" } do %>
+  <%= form_with url: form_activation_path(form.slug), method: :patch, class: "contents", data: { controller: "form" } do %>
     <label class="switch" title="<%= active ? "Active: takes submissions" : "Inactive" %>">
       <%= hidden_field_tag :active, "0", id: nil %>
       <%= check_box_tag :active, "1", active, id: nil, class: "switch__input", "aria-label": "Active: " + form.title,
@@ -12,5 +12,5 @@
     </label>
   <% end %>
 <% else %>
-  <span class="txt-small"><%= active ? "Active" : "Inactive" %></span>
+  <span class="text-sm text-gray-700"><%= active ? "Active" : "Inactive" %></span>
 <% end %>

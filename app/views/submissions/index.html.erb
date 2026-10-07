@@ -3,7 +3,7 @@
 
 <%= render "layouts/shared/page_header", title: @page_title, description: "Everything sent through every form, newest first." %>
 
-<div class="filters margin-block-end">
+<div class="mb-4 flex flex-wrap gap-2">
   <%= render "layouts/shared/quick_filter", title: "Form", param: :form, options: submission_form_options(@forms), current: @form&.slug %>
 </div>
 
@@ -13,35 +13,35 @@
         noun: "submission", message: "The submissions and any files attached to them are removed. This can’t be undone." %>
 <% end %>
 
-<section class="panel shadow center index-table" data-controller="select-all">
-  <table class="data-table" data-controller="pagination" data-pagination-paginate-on-intersection-value="true" data-pagination-discard-frame-value="true">
+<section class="<%= ui(:panel, "overflow-x-auto") %>" data-controller="select-all">
+  <table class="data-table <%= ui(:table) %>" data-controller="pagination" data-pagination-paginate-on-intersection-value="true" data-pagination-discard-frame-value="true">
     <thead>
       <tr>
         <% if can_delete %>
-          <th class="data-table__check"><% if @submissions.any? %><input type="checkbox" aria-label="Select every row" data-select-all-target="all" data-action="select-all#toggle"><% end %></th>
+          <th class="<%= ui(:th, "data-table__check") %>"><% if @submissions.any? %><input type="checkbox" aria-label="Select every row" data-select-all-target="all" data-action="select-all#toggle"><% end %></th>
         <% end %>
-        <th>Form</th>
-        <th>Preview</th>
-        <th class="data-table__number">Files</th>
-        <th>IP</th>
-        <th>Received</th>
+        <th class="<%= ui(:th) %>">Form</th>
+        <th class="<%= ui(:th) %>">Preview</th>
+        <th class="<%= ui(:th, "text-right") %>">Files</th>
+        <th class="<%= ui(:th) %>">IP</th>
+        <th class="<%= ui(:th) %>">Received</th>
       </tr>
     </thead>
     <tbody id="<%= pagination_frame_id_for(:submissions_rows, @page.number) %>">
       <% @submissions.each do |submission| %>
         <%# herb:key submission.id %>
-        <tr id="<%= dom_id(submission) %>" data-filter-target="item">
+        <tr id="<%= dom_id(submission) %>" class="hover:bg-gray-50" data-filter-target="item">
           <% if can_delete %>
-            <td class="data-table__check"><input type="checkbox" data-select-all-target="box" data-action="select-all#sync" name="ids[]" value="<%= submission.id %>" form="submissions_bulk_deletion" aria-label="Select submission <%= submission.id %>"></td>
+            <td class="<%= ui(:td, "data-table__check") %>"><input type="checkbox" data-select-all-target="box" data-action="select-all#sync" name="ids[]" value="<%= submission.id %>" form="submissions_bulk_deletion" aria-label="Select submission <%= submission.id %>"></td>
           <% end %>
-          <td><%= link_to submission.form.title, form_path(submission.form.slug), class: "txt-ink font-weight-bold" %></td>
-          <td>
+          <td class="<%= ui(:td) %>"><%= link_to submission.form.title, form_path(submission.form.slug), class: "whitespace-nowrap font-medium text-gray-900 hover:underline" %></td>
+          <td class="<%= ui(:td) %>">
             <% preview = submission_preview(submission) %>
-            <%= link_to preview.presence || "Empty submission", form_submission_path(submission.form.slug, submission.id), class: "txt-subtle" %>
+            <%= link_to preview.presence || "Empty submission", form_submission_path(submission.form.slug, submission.id), class: "text-gray-500 hover:text-gray-900 hover:underline" %>
           </td>
-          <td class="data-table__number"><%= submission.files.count %></td>
-          <td class="txt-subtle font-mono txt-small"><%= submission.ip %></td>
-          <td class="txt-subtle txt-small"><%= time_ago_tag submission.created_at %></td>
+          <td class="<%= ui(:td, "text-right tabular-nums") %>"><%= submission.files.count %></td>
+          <td class="<%= ui(:td) %>"><span class="font-mono text-xs text-gray-500"><%= submission.ip %></span></td>
+          <td class="<%= ui(:td) %>"><span class="whitespace-nowrap text-xs text-gray-500"><%= time_ago_tag submission.created_at %></span></td>
         </tr>
       <% end %>
       <%= table_next_page_row :submissions_rows, @page, columns: can_delete ? 6 : 5 %>

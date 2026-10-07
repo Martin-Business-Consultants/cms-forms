@@ -1,28 +1,43 @@
 <%# locals: (key:) %>
-<%# A field on the builder's canvas: a preview of it as the site shows it
-    (drawn by the builder from the field's settings), picked to edit and
-    dragged to reorder. Its settings are in the side panel (forms/_field_settings);
-    the hidden _row comes first so the row posts in the canvas's order. %>
-<li class="form-card" tabindex="0" draggable="true" data-key="<%= key %>" data-forms--builder-target="card"
+<%# A field in the builder, as a row of the list: a header with the drag
+    handle, the field's type and name and its moves, over a preview of it as
+    the site shows it (drawn by the builder from its settings). Picked, its
+    settings open in the sheet (forms/_field_sheet); the hidden _row comes
+    first so the row posts in the list's order. %>
+<% tool_classes = ui(:button, :plain, :icon) %>
+<li class="form-card rounded-lg border bg-white" tabindex="0" draggable="true" data-key="<%= key %>" data-forms--builder-target="card"
     data-action="click->forms--builder#pick keydown.enter->forms--builder#pick">
   <%= hidden_field_tag "form[fields][" + key + "][_row]", "", id: nil %>
-  <div class="form-card__preview" data-role="preview"></div>
-  <div class="form-card__tools">
-    <button type="button" class="btn btn--circle btn--plain" title="Move up" data-action="forms--builder#moveUp">
-      <%= icon_tag "arrow-up" %>
-      <span class="for-screen-reader">Move up</span>
-    </button>
-    <button type="button" class="btn btn--circle btn--plain form-card__down" title="Move down" data-action="forms--builder#moveDown">
-      <%= icon_tag "arrow-up" %>
-      <span class="for-screen-reader">Move down</span>
-    </button>
-    <button type="button" class="btn btn--circle btn--plain" title="Duplicate" data-action="forms--builder#duplicate">
-      <%= icon_tag "copy-paste" %>
-      <span class="for-screen-reader">Duplicate</span>
-    </button>
-    <button type="button" class="btn btn--circle btn--plain txt-negative" title="Delete" data-action="forms--builder#remove">
-      <%= icon_tag "trash" %>
-      <span class="for-screen-reader">Delete</span>
-    </button>
+  <div class="flex items-center gap-2 border-b border-gray-100 py-1.5 pl-2 pr-1.5">
+    <span class="cursor-grab select-none px-1 text-gray-400" title="Drag to reorder" aria-hidden="true">⠿</span>
+    <span class="flex min-w-0 flex-1 items-baseline gap-2">
+      <span class="shrink-0 text-sm font-medium text-gray-900" data-role="kind"></span>
+      <code class="truncate font-mono text-xs text-gray-500" data-role="name"></code>
+    </span>
+    <span class="flex shrink-0 items-center">
+      <button type="button" class="<%= tool_classes %>" title="Settings" data-action="forms--builder#pick">
+        <%= icon_tag "settings-outline", class: "size-4" %>
+        <span class="sr-only">Field settings</span>
+      </button>
+      <button type="button" class="<%= tool_classes %>" title="Move up" data-action="forms--builder#moveUp">
+        <%= icon_tag "arrow-up", class: "size-4" %>
+        <span class="sr-only">Move up</span>
+      </button>
+      <button type="button" class="<%= tool_classes %>" title="Move down" data-action="forms--builder#moveDown">
+        <%= icon_tag "arrow-up", class: "size-4 rotate-180" %>
+        <span class="sr-only">Move down</span>
+      </button>
+      <span class="hidden sm:flex">
+        <button type="button" class="<%= tool_classes %>" title="Duplicate" data-action="forms--builder#duplicate">
+          <%= icon_tag "copy-paste", class: "size-4" %>
+          <span class="sr-only">Duplicate</span>
+        </button>
+      </span>
+      <button type="button" class="inline-flex size-8 items-center justify-center rounded-md text-gray-500 hover:bg-red-50 hover:text-red-700" title="Delete" data-action="forms--builder#remove">
+        <%= icon_tag "trash", class: "size-4" %>
+        <span class="sr-only">Delete</span>
+      </button>
+    </span>
   </div>
+  <div class="pointer-events-none flex flex-col gap-1.5 px-4 py-3" data-role="preview"></div>
 </li>
