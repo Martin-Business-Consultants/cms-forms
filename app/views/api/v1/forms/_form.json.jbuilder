@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A published form as a site renders and posts it.
 json.extract! form, :id, :slug, :title, :fields, :submit_label, :success_message
 json.action form.submit_url.presence || api_form_submissions_url(form.slug, **Site.url_options)
