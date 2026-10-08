@@ -1,6 +1,6 @@
 # Forms
 
-A plugin for the CMS (see `docs/plugins.md` in [opencms](https://github.com/Martin-Business-Consultants/opencms)).
+A plugin for the CMS (see `docs/plugins.md` in [LibrePublish CMS](https://github.com/Martin-Business-Consultants/cmsv2)).
 
 Install it into a CMS checkout:
 
