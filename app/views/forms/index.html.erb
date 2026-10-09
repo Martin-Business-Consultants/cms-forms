@@ -65,7 +65,7 @@
                 delete_path: (form_path(form.slug) if can_delete), delete_label: "Trash",
                 delete_message: "It goes to the trash, where it can be restored. The site’s posts to it fail until then." %>
           </td>
-          <td class="<%= ui(:td, "text-right tabular-nums text-gray-500") %>"><%= form.id %></td>
+          <td class="<%= ui(:td, "text-right tabular-nums") %>"><span class="text-gray-500"><%= form.id %></span></td>
           <td class="<%= ui(:td, "text-right tabular-nums") %>"><%= Array(form.fields).size %></td>
           <td class="<%= ui(:td, "text-right tabular-nums") %>"><%= link_to @submission_counts.fetch(form.id, 0), form_path(form.slug), class: ui(:link) %></td>
           <td class="<%= ui(:td) %>">
