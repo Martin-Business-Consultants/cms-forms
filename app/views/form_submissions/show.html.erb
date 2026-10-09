@@ -7,8 +7,9 @@
           message: "The submission and its files are deleted. This can’t be undone." %>
   <% end %>
 <% end %>
-<%= render "layouts/shared/page_header", title: @page_title,
-      description: "Received " + time_ago_in_words(@submission.created_at) + " ago" + (@submission.ip.present? ? " from " + @submission.ip : "") + "." %>
+<%= render "layouts/shared/page_header", title: @page_title %>
+<%# The header shows no description, so when and where it came from is said here. %>
+<p class="<%= ui(:help) %> mb-4">Received <%= time_ago_in_words(@submission.created_at) %> ago<%= " from #{@submission.ip}" if @submission.ip.present? %>.</p>
 
 <div class="flex max-w-3xl flex-col gap-6">
   <section class="<%= ui(:panel) %>">
