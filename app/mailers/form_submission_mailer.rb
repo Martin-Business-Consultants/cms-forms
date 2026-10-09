@@ -46,24 +46,19 @@ class FormSubmissionMailer < ApplicationMailer
     form_email.notification? ? "[#{@form.title}] New submission ##{@submission.id}" : "Thanks for your submission"
   end
 
-  # Resolve the branding logo to an absolute URL so email clients can fetch
-  # it. Pulled from the `branding` Setting; needs Setting.get("general")
-  # ["site_base_url"] to build a host-qualified URL. Returns nil if either
-  # piece is missing — the layout hides the logo block in that case.
+  # The branding logo as an absolute URL on the CMS itself (APP_HOST,
+  # Site.url_options), so email clients can fetch it. Not the site's URL
+  # (Settings › General): that's the public website, which doesn't serve the
+  # CMS's files, so a logo linked there never showed. nil without a logo; the
+  # layout hides the logo block then.
   def compute_logo_url
-    branding = Setting.get("branding")
-    logo_id  = branding["logo_id"]
+    logo_id = Setting.get("branding")["logo_id"]
     return nil if logo_id.blank?
 
     asset = Asset.with_attached_file.find_by(id: logo_id)
     return nil unless asset&.file&.attached?
 
-    base = Setting.get("general")["site_base_url"].to_s
-    base = base.sub(%r{/+\z}, "")
-    return nil if base.empty?
-
-    path = Rails.application.routes.url_helpers.rails_blob_path(asset.file, only_path: true)
-    "#{base}#{path}"
+    rails_blob_url(asset.file, **Site.url_options)
   rescue StandardError
     nil
   end
