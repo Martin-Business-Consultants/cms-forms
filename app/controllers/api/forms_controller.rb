@@ -53,7 +53,7 @@ class Api::FormsController < Api::BaseController
       :notify_emails, :notify_webhook_url,
       fields: [
         :name, :label, :type, :required, :placeholder, :help, :default,
-        :accept, :multiple, :max_size,
+        :accept, :multiple, :max_size, :options_collection,
         {options: [:value, :label]}
       ]
     )

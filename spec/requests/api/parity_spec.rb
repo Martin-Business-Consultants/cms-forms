@@ -14,6 +14,17 @@ RSpec.describe "Forms API parity", type: :request do
 
   def json = JSON.parse(response.body)
 
+  describe "forms" do
+    it "takes a field's choices from a collection" do
+      fields = [{name: "service", label: "Service", type: "select", options_collection: "services"}]
+
+      post "/api/forms", params: {form: {slug: "booking", title: "Booking", fields: fields}}, headers: auth, as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(Form.find_by!(slug: "booking").fields.first).to include("options_collection" => "services")
+    end
+  end
+
   describe "submissions" do
     let!(:form) do
       Form.create!(slug: "contact", title: "Contact", status: "published",
