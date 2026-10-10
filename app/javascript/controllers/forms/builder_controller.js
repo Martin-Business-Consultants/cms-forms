@@ -275,8 +275,11 @@ export default class extends Controller {
   }
 
   #input(type, value, settings) {
-    const choices = value("options").split("\n").map(line => line.trim()).filter(Boolean)
+    const typed = value("options").split("\n").map(line => line.trim()).filter(Boolean)
       .map(line => (line.split(" | ")[1] || line.split(" | ")[0]).trim())
+    // Choices from a collection come first; the preview names the collection in their place.
+    const collection = this.#field(settings, "options_collection")
+    const choices = collection?.value ? [`${collection.selectedOptions[0].textContent}…`, ...typed] : typed
 
     switch (type) {
       case "textarea":

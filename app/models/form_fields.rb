@@ -11,6 +11,7 @@ require "json"
 #   form[fields][f0][type]=email
 #   form[fields][x1y2][type]=select
 #   form[fields][x1y2][options]=general | General inquiry
+#   form[fields][x1y2][options_collection]=services    (its entries first: FormChoices)
 #
 # Rows come back in the order they were posted, which is the order on screen,
 # keyed by an opaque id so rows can be added, removed and reordered without
@@ -20,7 +21,7 @@ require "json"
 # in each row's `extra` JSON and are put back untouched.
 class FormFields
   # Keys the builder has a control for. Anything else a field carries is `extra`.
-  EDITED_KEYS = %w[name label type required placeholder help default options accept multiple max_size].freeze
+  EDITED_KEYS = %w[name label type required placeholder help default options options_collection accept multiple max_size].freeze
 
   # Types a person types into, which a placeholder and a default make sense for.
   TEXT_TYPES = %w[text email tel url textarea].freeze
@@ -87,7 +88,10 @@ class FormFields
         field["default"] = row["default"] if row["default"].present?
       end
       field["help"] = row["help"].strip if row["help"].present?
-      field["options"] = options_from(row["options"]) if FormValidator::OPTIONED_TYPES.include?(type)
+      if FormValidator::OPTIONED_TYPES.include?(type)
+        field["options"] = options_from(row["options"])
+        field["options_collection"] = row["options_collection"] if row["options_collection"].present?
+      end
 
       if type == "file"
         field["accept"] = row["accept"].strip if row["accept"].present?

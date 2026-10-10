@@ -13,7 +13,7 @@ module FormEmail::Sample
   end
 
   def answer(field)
-    choices = Array(field["options"]).filter_map { it["label"] if it.is_a?(Hash) }
+    choices = FormChoices.for(field).filter_map { it["label"] }
     case field["type"]
     when "email" then "sam@example.com"
     when "tel" then "555 0100"

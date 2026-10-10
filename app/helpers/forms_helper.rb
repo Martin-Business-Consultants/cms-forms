@@ -10,6 +10,11 @@ module FormsHelper
     FormValidator::FIELD_TYPES.map { |type| [FIELD_TYPE_LABELS.fetch(type, type.humanize), type] }
   end
 
+  # The collections a choice field can take its choices from (FormChoices).
+  def form_choice_collection_options(selected)
+    options_for_select([["None: only the choices above", ""]] + Collection.order(:name).pluck(:name, :slug), selected)
+  end
+
   # The builder's Add Fields panel, grouped as Gravity Forms groups them:
   # [group, [[type, label, icon], …]].
   FIELD_PALETTE = [
