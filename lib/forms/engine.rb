@@ -4,38 +4,44 @@ module Forms
   # A CMS plugin (docs/plugins.md): it extends the core only through
   # Cms::Plugins, and the core never names it.
   class Engine < ::Rails::Engine
-    # The public and API paths are the ones the sites and the CLI already use.
+    # The public and API paths are the ones the sites and the CLI already use,
+    # at the root.
     initializer "forms.routes" do |app|
       app.routes.append do
-        # One new block row for a form email's editor (FormEmail::BlockTypes).
-        get "form_email_blocks/new", to: "form_email_blocks#new", as: :new_form_email_block
+        # The admin's pages go under /cms (Cms::PATH) with the core's; a core
+        # from before /cms (1.7 and earlier) has them at the root.
+        admin = proc do
+          # One new block row for a form email's editor (FormEmail::BlockTypes).
+          get "form_email_blocks/new", to: "form_email_blocks#new", as: :new_form_email_block
 
-        # Before `resources :forms`, so /forms/export isn't read as a form.
-        namespace :forms do
-          resource :export, only: :show
-          resource :import, only: :create
-          resources :bulk_deletions, only: :create
-        end
+          # Before `resources :forms`, so /forms/export isn't read as a form.
+          namespace :forms do
+            resource :export, only: :show
+            resource :import, only: :create
+            resources :bulk_deletions, only: :create
+          end
 
-        resources :forms, param: :slug do
-          resource :activation, only: :update, controller: "forms/activations"
-          resource :duplication, only: :create, controller: "forms/duplications"
-          resources :submissions, controller: "form_submissions", only: [:index, :show, :destroy]
-          resources :emails, controller: "form_emails", only: [:edit, :update], param: :kind,
-            constraints: {kind: /notification|confirmation/} do
-            resource :preview, only: [:create, :update], controller: "form_emails/previews", constraints: {email_kind: /notification|confirmation/}
-            resource :test, only: :create, controller: "form_emails/tests", constraints: {email_kind: /notification|confirmation/}
+          resources :forms, param: :slug do
+            resource :activation, only: :update, controller: "forms/activations"
+            resource :duplication, only: :create, controller: "forms/duplications"
+            resources :submissions, controller: "form_submissions", only: [:index, :show, :destroy]
+            resources :emails, controller: "form_emails", only: [:edit, :update], param: :kind,
+              constraints: {kind: /notification|confirmation/} do
+              resource :preview, only: [:create, :update], controller: "form_emails/previews", constraints: {email_kind: /notification|confirmation/}
+              resource :test, only: :create, controller: "form_emails/tests", constraints: {email_kind: /notification|confirmation/}
+            end
+          end
+
+          namespace :submissions do
+            resources :bulk_deletions, only: :create
+          end
+          resources :submissions, only: [:index]
+
+          namespace :settings do
+            resource :forms, only: [:show, :update], controller: "forms"
           end
         end
-
-        namespace :submissions do
-          resources :bulk_deletions, only: :create
-        end
-        resources :submissions, only: [:index]
-
-        namespace :settings do
-          resource :forms, only: [:show, :update], controller: "forms"
-        end
+        defined?(Cms::PATH) ? scope(path: Cms::PATH, &admin) : admin.call
 
         namespace :api, defaults: {format: :json} do
           resources :forms, param: :slug, only: [:index, :show, :create, :update, :destroy] do
@@ -81,7 +87,7 @@ module Forms
     end
 
     config.to_prepare do
-      Cms::Plugins.register :forms, name: "Forms", version: "1.0.0", author: "Martin Business Consultants",
+      Cms::Plugins.register :forms, name: "Forms", version: "1.1.0", author: "Martin Business Consultants",
         enabled_by_default: true, requires: ">= 1.0",
         description: "Contact, booking and signup forms for the site: their fields and emails, the endpoint " \
                      "the site posts to, spam protection, and the Submissions inbox.",

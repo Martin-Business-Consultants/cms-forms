@@ -44,10 +44,13 @@ class FormValidator
         end
 
         if OPTIONED_TYPES.include?(type)
-          opts = fd["options"]
-          unless opts.is_a?(Array) && opts.any? && opts.all? { |o| o.is_a?(Hash) && o["value"].is_a?(String) && o["label"].is_a?(String) }
+          # Choices from a collection (FormChoices) may stand alone; typed ones then only add to them.
+          collection = fd["options_collection"]
+          opts = fd["options"] || (collection ? [] : nil)
+          unless opts.is_a?(Array) && (opts.any? || collection.present?) && opts.all? { |o| o.is_a?(Hash) && o["value"].is_a?(String) && o["label"].is_a?(String) }
             errors << "#{prefix}.options must be an array of {value, label} objects"
           end
+          errors << "#{prefix}.options_collection must be a collection's slug" unless collection.nil? || collection.is_a?(String)
         end
       end
       errors

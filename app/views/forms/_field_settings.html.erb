@@ -22,6 +22,11 @@
       <%= text_area_tag name + "[options]", FormFields.options_text(field), id: nil, rows: 4, class: "w-full font-mono", data: { role: "options" } %>
       <span class="<%= ui(:help) %>">One per line: <code class="font-mono">value | label</code>, or just the label.</span>
     </label>
+    <label class="<%= shown_classes %>" data-for="choices">
+      <span class="<%= ui(:label) %>">Choices from a collection</span>
+      <%= select_tag name + "[options_collection]", form_choice_collection_options(field["options_collection"]), id: nil, class: "w-full", data: { role: "options_collection" } %>
+      <span class="<%= ui(:help) %>">Its published entries come first, in order, then the choices above. A new entry joins the list as it's published.</span>
+    </label>
     <div class="flex-col gap-5" data-for="file">
       <label class="<%= field_classes %>">
         <span class="<%= ui(:label) %>">Accepted files</span>

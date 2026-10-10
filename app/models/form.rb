@@ -271,7 +271,7 @@ class Form < ApplicationRecord
   # => Array<ActionDispatch::Http::UploadedFile>). Returns
   # { "field_name" => [msg, ...] } — empty when valid.
   def validate_submission(data, files = {})
-    FormValidator.validate_submission(fields, data, files)
+    FormValidator.validate_submission(FormChoices.resolve(fields), data, files)
   end
 
   # The form in /api/manifest's `forms`: what a site needs to render and post it.

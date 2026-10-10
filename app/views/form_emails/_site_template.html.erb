@@ -2,6 +2,9 @@
 <%# Whether the Astro site has built this email's template
     (FormEmail::SiteTemplate), and so which design goes out. %>
 <% case email.site_template_status %>
+<% when :theme %>
+  <p class="flex flex-wrap items-center gap-2 text-gray-900"><%= status_tag "ready" %> The website’s theme designs it.</p>
+  <p class="<%= ui(:help) %>">Drawn from these blocks each time it’s sent, so a change goes out with the next one.</p>
 <% when :current %>
   <p class="flex flex-wrap items-center gap-2 text-gray-900"><%= status_tag "ready" %> The site’s design is sent.</p>
   <p class="<%= ui(:help) %>">Built from these blocks, received <%= time_ago_tag email.site_template_received_at %>.</p>
