@@ -28,11 +28,15 @@ module FormEmail::SiteTemplate
   # :theme (the theme draws it), :current (the site's, sent as is), :stale
   # (built from older blocks), or :none.
   def site_template_status
-    return :theme if Website.draws?(THEME_TEMPLATE)
+    return :theme if theme_draws_it?
     return :none if site_template.blank?
 
     site_template_digest == content_digest ? :current : :stale
   end
+
+  # A core before themes (1.6) has no Website; there, the site's design is
+  # the pushed template alone.
+  def theme_draws_it? = defined?(::Website) && ::Website.respond_to?(:draws?) && ::Website.draws?(THEME_TEMPLATE)
 
   # Whether it goes out in the site's design rather than the CMS's layout.
   def site_template_current? = site_template_status.in?(%i[theme current])
