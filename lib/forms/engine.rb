@@ -127,6 +127,12 @@ module Forms
       # What /api/v1/site tells a build about forms.
       Cms::Plugins.provide :forms, :site_config, -> { {forms: {captcha: Forms.public_captcha}} }
       Cms::Plugins.provide :forms, :published_forms, -> { Form.where(status: "published").order(:title).to_a }
+      # A theme draws forms into its pages: an edited, trashed or restored form
+      # changes what a cached page depends on (core 1.30's website.cache_version;
+      # an older core never asks).
+      Cms::Plugins.filter(:forms, "website.cache_version") do |parts|
+        parts + [Form.with_discarded.pick(Arel.sql("COUNT(*)"), Arel.sql("MAX(updated_at)"), Arel.sql("SUM(julianday(updated_at))")).join(":")]
+      end
       # For Site Health: which spam protection the forms use, and whether it has both its keys.
       Cms::Plugins.provide :forms, :spam_protection, -> {
         provider = Setting.get(Forms::SETTING_KEY)["captcha_provider"].presence_in(%w[turnstile recaptcha])

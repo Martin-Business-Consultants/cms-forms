@@ -3,7 +3,7 @@
 require "rails_helper"
 
 # What Forms adds to core screens: Site Health's spam check, webhooks narrowed
-# to forms, and the audit trail of a bulk delete.
+# to forms, the audit trail of a bulk delete, and the website's cache.
 RSpec.describe "Forms in the core", type: :request do
   let(:admin) { create(:user) }
 
@@ -36,5 +36,16 @@ RSpec.describe "Forms in the core", type: :request do
     post forms_bulk_deletions_path, params: {slugs: %w[contact ghost]}
 
     expect(last_event).to have_attributes(action: "form.bulk_deleted", metadata: {"count" => 1, "slugs" => %w[contact]})
+  end
+
+  it "changes what a cached website page depends on when a form is edited or trashed" do
+    form = Form.create!(slug: "contact", title: "Contact", status: "published", fields: [])
+    before = Website.cache_version
+
+    form.update!(title: "Get in touch")
+    edited = Website.cache_version
+    form.discard!
+
+    expect([before, edited, Website.cache_version].uniq.size).to eq(3)
   end
 end
