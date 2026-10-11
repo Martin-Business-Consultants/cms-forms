@@ -11,6 +11,7 @@ class FormSubmission < ApplicationRecord
 
   include Eventable
   include Notifiable
+  include PersonalData
 
   # Its events have always been "submission.…".
   def self.eventable_prefix = "submission"

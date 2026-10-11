@@ -25,6 +25,16 @@
 
     <section class="<%= ui(:panel, "space-y-5 p-6") %>">
       <div class="space-y-1">
+        <h2 class="<%= ui(:heading) %>">Keeping submissions</h2>
+        <p class="text-sm text-gray-500">Submissions hold what people tell you about themselves. Keep them only as long as you need them: older ones are deleted each night, with their files. Someone’s data on request: Submissions › Personal data.</p>
+      </div>
+      <%= settings_field "Keep submissions for" do %>
+        <%= form.select :retention_days, FormSubmission::RETENTION_CHOICES.invert.to_a, { selected: @settings["retention_days"] }, class: "w-full" %>
+      <% end %>
+    </section>
+
+    <section class="<%= ui(:panel, "space-y-5 p-6") %>">
+      <div class="space-y-1">
         <h2 class="<%= ui(:heading) %>">Spam protection</h2>
         <p class="text-sm text-gray-500">A submission has to pass this check before it reaches the inbox. The site shows the widget with the site key.</p>
       </div>

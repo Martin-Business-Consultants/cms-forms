@@ -12,7 +12,7 @@ class Settings::FormsController < Settings::BaseController
   requires_capability "forms:write", only: :update
 
   SETTING_KEY = Forms::SETTING_KEY
-  FIELDS = %w[from_name from_email captcha_provider captcha_theme turnstile_site_key recaptcha_site_key].freeze
+  FIELDS = %w[from_name from_email captcha_provider captcha_theme turnstile_site_key recaptcha_site_key retention_days].freeze
   SECRET_FIELDS = %w[turnstile_secret_key recaptcha_secret_key].freeze
   CAPTCHA_PROVIDERS = {"none" => "None", "turnstile" => "Cloudflare Turnstile", "recaptcha" => "Google reCAPTCHA"}.freeze
   CAPTCHA_THEMES = {"auto" => "Match the visitor's system", "light" => "Light", "dark" => "Dark"}.freeze

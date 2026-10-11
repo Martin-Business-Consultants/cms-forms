@@ -34,6 +34,10 @@ module Forms
 
           namespace :submissions do
             resources :bulk_deletions, only: :create
+            # A person's data: find, download, delete (Submissions::PersonalDataController).
+            resource :personal_data, only: [:show, :destroy], controller: "personal_data" do
+              get :export
+            end
           end
           resources :submissions, only: [:index]
 
@@ -100,6 +104,10 @@ module Forms
         after: "All forms"
       Cms::Plugins.submenu :forms, :forms, label: "Submissions", path: -> { submissions_path },
         capability: "submissions:read", after: "Add new"
+      Cms::Plugins.submenu :forms, :forms, label: "Personal data", path: -> { submissions_personal_data_path },
+        capability: "submissions:read", after: "Submissions"
+      # Submissions past Settings › Forms › Keep submissions for go each night.
+      Cms::Plugins.nightly :forms, -> { FormSubmission::PurgeExpiredJob.perform_later }
       Cms::Plugins.new_item :forms, label: "Form", path: -> { new_form_path }, capability: "forms:write", after: "Global"
       Cms::Plugins.settings :forms, "Forms", -> { settings_forms_path },
         description: "Who form emails come from, and spam protection.", capability: "forms:read",
