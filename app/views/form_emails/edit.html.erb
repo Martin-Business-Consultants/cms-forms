@@ -39,10 +39,8 @@
         <%= form.check_box :enabled %>
         <span class="<%= ui(:label) %>">Send this email</span>
       </label>
-      <% if @email.notification? %>
-        <%= settings_field "Recipients", hint: "Comma-separated." do %>
-          <%= form.text_field :recipients, class: "w-full", placeholder: "alice@example.com, bob@example.com" %>
-        <% end %>
+      <% if @email.notification? then %>
+        <%= render "form_emails/recipients", email: @email %>
       <% else %>
         <%= settings_field "Send to the address in", hint: "Blank uses the form’s first email field." do %>
           <%= form.select :from_field, email_fields.map { |f| [f["label"].to_s + " (" + f["name"].to_s + ")", f["name"]] }, { include_blank: "The first email field" }, class: "w-full" %>

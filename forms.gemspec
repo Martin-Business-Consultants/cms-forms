@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "forms"
-  spec.version = "1.3.3"
+  spec.version = "1.4.0"
   spec.summary = "The CMS's forms, their public submission endpoint, and the submissions inbox"
   spec.authors = ["Martin Business Consultants"]
   spec.files = Dir["{app,config,db,lib}/**/*"]

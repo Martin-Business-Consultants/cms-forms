@@ -52,6 +52,29 @@ RSpec.describe "Form emails", type: :request do
       expect(response.body).to include("text is required")
     end
 
+    it "takes the notification's recipients as Name and Email rows, and sends with the names in the To line" do
+      email.update!(recipients: "ops@x.test, owner@x.test")
+      get edit_form_email_path(form_slug: form.slug, kind: "notification")
+      expect(response.body).to include(%(value="ops@x.test"), %(value="owner@x.test"), "Add recipient")
+
+      patch form_email_path(form_slug: form.slug, kind: "notification"), params: {form_email: {enabled: "1", recipient_entries: [
+        {name: "Sarah Martin", email: "sarah@x.test"}, {name: "", email: "ops@x.test"}, {name: "Nobody", email: ""}, {name: "Again", email: "OPS@x.test"}
+      ]}}
+
+      expect(email.reload.recipients).to eq("Sarah Martin <sarah@x.test>, ops@x.test")
+      expect(email.recipient_entries.map(&:to_h)).to eq([{name: "Sarah Martin", email: "sarah@x.test"}, {name: "", email: "ops@x.test"}])
+
+      submission = form.submissions.create!(data: {"name" => "Ann", "email" => "ann@x.test"}, meta: {}, ip: "127.0.0.1")
+      expect { submission.send(:deliver_notification, email.reload) }.to change { ActionMailer::Base.deliveries.size }.by(1)
+      expect(ActionMailer::Base.deliveries.last[:to].value).to eq("Sarah Martin <sarah@x.test>, ops@x.test")
+    end
+
+    it "refuses a recipient that isn't an email address" do
+      patch form_email_path(form_slug: form.slug, kind: "notification"), params: {form_email: {enabled: "1", recipient_entries: [{name: "Ops", email: "not-an-address"}]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("isn&#39;t an email address")
+    end
+
     it "previews the unsaved email for a made-up submission" do
       patch form_email_preview_path(form_slug: form.slug, email_kind: "notification"), params: {form_email: {blocks: {
         "_list" => "1", "r1" => {"type" => "email_heading", "version" => "1", "data" => {"text" => "Hi {{name}}", "level" => "h1", "align" => "left"}}

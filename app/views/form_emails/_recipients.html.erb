@@ -1,0 +1,37 @@
+<%# locals: (email:) %>
+<%# Who the notification goes to, a row each: a name (shown in the To line)
+    and an address (FormEmail#recipient_entries). Add and Remove are
+    forms--recipients; there's always a row to fill in. %>
+<% entries = email.recipient_entries.presence || [FormEmail::Recipient.new(name: "", email: "")] %>
+<% row_classes = "flex items-start gap-1.5 rounded-lg border border-gray-200 p-2" %>
+<fieldset class="flex flex-col gap-2" data-controller="forms--recipients">
+  <legend class="<%= ui(:label) %> mb-1.5">Recipients</legend>
+  <div class="flex flex-col gap-2" data-forms--recipients-target="list">
+    <% entries.each_with_index do |entry, index| %>
+      <%# herb:key index %>
+      <div class="<%= row_classes %>" data-forms--recipients-target="row">
+        <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+          <input type="text" name="form_email[recipient_entries][][name]" value="<%= entry.name %>" placeholder="Name" aria-label="Name" class="w-full" autocomplete="off">
+          <input type="email" name="form_email[recipient_entries][][email]" value="<%= entry.email %>" placeholder="Email" aria-label="Email" class="w-full" autocomplete="off">
+        </div>
+        <button type="button" class="<%= ui(:button, :plain, :icon) %>" title="Remove" data-action="forms--recipients#remove">
+          <%= icon_tag "close", class: "size-4" %><span class="sr-only">Remove</span>
+        </button>
+      </div>
+    <% end %>
+  </div>
+  <template data-forms--recipients-target="template">
+    <div class="<%= row_classes %>" data-forms--recipients-target="row">
+      <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+        <input type="text" name="form_email[recipient_entries][][name]" placeholder="Name" aria-label="Name" class="w-full" autocomplete="off">
+        <input type="email" name="form_email[recipient_entries][][email]" placeholder="Email" aria-label="Email" class="w-full" autocomplete="off">
+      </div>
+      <button type="button" class="<%= ui(:button, :plain, :icon) %>" title="Remove" data-action="forms--recipients#remove">
+        <%= icon_tag "close", class: "size-4" %><span class="sr-only">Remove</span>
+      </button>
+    </div>
+  </template>
+  <button type="button" class="<%= ui(:button, :small, "self-start") %>" data-action="forms--recipients#add">
+    <%= icon_tag "add", class: "size-4" %><span>Add recipient</span>
+  </button>
+</fieldset>
