@@ -72,16 +72,14 @@ class Api::FormSubmissionsController < Api::BaseController
 
   private
 
-  TURNSTILE_TOKEN_PARAMS = %w[cf-turnstile-response turnstile_token].freeze
 
   # True when no Turnstile secret is configured — the endpoint then behaves
   # as it always has.
   def captcha_passed?
-    verifier = TurnstileVerifier.from_settings
+    verifier = TurnstileVerifier.for_settings
     return true unless verifier
 
-    token = TURNSTILE_TOKEN_PARAMS.lazy.map { |k| params[k].presence }.find(&:itself)
-    verifier.verify(token, remote_ip: request.remote_ip)
+    verifier.verify(verifier.token_from(params), remote_ip: request.remote_ip)
   end
 
   # Pull data + files out of params using the form's field schema as the

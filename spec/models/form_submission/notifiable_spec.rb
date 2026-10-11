@@ -15,6 +15,18 @@ RSpec.describe FormSubmission::Notifiable do
     Cms::Plugins.switch!(:forms, on: true)
   end
 
+  it "won't take, or post to, a webhook on this server's network or a cloud metadata address" do
+    form = Form.new(slug: "probe", title: "Probe", status: "published", notify_webhook_url: "http://169.254.169.254/latest/meta-data",
+      fields: [{"name" => "email", "label" => "Email", "type" => "email"}])
+    expect(form).not_to be_valid
+    expect(form.errors[:notify_webhook_url].join).to include("private or local")
+
+    self.form.update_column(:notify_webhook_url, "http://127.0.0.1:6379/")
+    submission = self.form.submissions.create!(data: {"email" => "a@b.test"}, meta: {}, ip: "1.2.3.4")
+    expect_any_instance_of(Net::HTTP).not_to receive(:request)
+    submission.notify_now
+  end
+
   it "is queued when a submission arrives" do
     expect { form.submissions.create!(data: {"email" => "a@b.test"}, meta: {}, ip: "1.2.3.4") }
       .to have_enqueued_job(FormSubmission::NotificationJob)

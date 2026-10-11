@@ -15,6 +15,18 @@ require "net/http"
 # unreachable is no captcha at all.
 class TurnstileVerifier
   VERIFY_URL = URI("https://challenges.cloudflare.com/turnstile/v0/siteverify")
+  # Where a page's widget puts its answer, by name.
+  TOKEN_PARAMS = %w[cf-turnstile-response turnstile_token].freeze
+
+  # The check the chosen provider (Settings › Forms) makes, or nil for none:
+  # Turnstile, or reCAPTCHA (RecaptchaVerifier). A provider chosen without its
+  # secret checks nothing, as before; one with it always checks.
+  def self.for_settings
+    case Setting.get("forms_settings")["captcha_provider"].presence || "turnstile"
+    when "turnstile" then from_settings
+    when "recaptcha" then RecaptchaVerifier.from_settings
+    end
+  end
 
   # nil unless a Turnstile secret is set and Turnstile hasn't been switched
   # off in favour of another provider. A secret left behind after choosing
@@ -38,16 +50,24 @@ class TurnstileVerifier
     form = {"secret" => @secret, "response" => token.to_s}
     form["remoteip"] = remote_ip if remote_ip.present?
 
-    response = Net::HTTP.start(VERIFY_URL.host, VERIFY_URL.port, use_ssl: true, open_timeout: 5, read_timeout: 5) do |http|
-      req = Net::HTTP::Post.new(VERIFY_URL.request_uri)
+    url = self.class::VERIFY_URL
+    response = Net::HTTP.start(url.host, url.port, use_ssl: true, open_timeout: 5, read_timeout: 5) do |http|
+      req = Net::HTTP::Post.new(url.request_uri)
       req.set_form_data(form)
       http.request(req)
     end
     return false unless response.is_a?(Net::HTTPSuccess)
 
-    JSON.parse(response.body)["success"] == true
+    passed?(JSON.parse(response.body))
   rescue StandardError => e
-    Rails.logger.warn("[forms] turnstile verification error: #{e.class}: #{e.message}")
+    Rails.logger.warn("[forms] #{self.class.name} verification error: #{e.class}: #{e.message}")
     false
   end
+
+  # The token, from whichever of the provider's names the page used.
+  def token_from(params) = self.class::TOKEN_PARAMS.lazy.map { params[it].presence }.find(&:itself)
+
+  private
+
+  def passed?(answer) = answer["success"] == true
 end

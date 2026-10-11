@@ -242,6 +242,7 @@ class Form < ApplicationRecord
   validates :status,       inclusion: {in: STATUSES}
   validates :submit_label, presence: true
   validate  :validate_fields_shape_via_validator
+  validate  :validate_webhook_url
 
   scope :ordered, -> { order(:slug) }
 
@@ -325,5 +326,16 @@ class Form < ApplicationRecord
         })
       ]
     )
+  end
+
+  private
+
+  # A webhook goes to the outside world only (OutboundUrl, on a core that has
+  # it): not this server, its network, or a cloud metadata address.
+  def validate_webhook_url
+    return if notify_webhook_url.blank? || !defined?(::OutboundUrl)
+
+    problem = ::OutboundUrl.problem_with(notify_webhook_url)
+    errors.add(:notify_webhook_url, problem) if problem
   end
 end

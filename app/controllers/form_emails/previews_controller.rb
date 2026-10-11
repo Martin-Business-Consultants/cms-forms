@@ -23,6 +23,11 @@ class FormEmails::PreviewsController < ApplicationController
     message = FormSubmissionMailer.with(form_email: email, submission: FormEmail::Sample.submission(@form),
       recipients: ["preview@example.com"]).deliver
 
+    # The email may be the site's own template, pushed by its build: HTML
+    # from outside the admin, drawn in a sandbox (no script, its own origin)
+    # so nothing in it acts as whoever is looking.
+    response.headers["Content-Security-Policy"] =
+      "sandbox; default-src 'none'; img-src * data: blob:; style-src 'unsafe-inline' *; font-src * data:"
     render html: browser_html(message).html_safe, layout: false
   end
 

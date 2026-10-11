@@ -39,6 +39,46 @@ RSpec.describe "API form submissions", type: :request do
     end
   end
 
+  # A stranger's post can't fill the disk: one file unless the field takes
+  # several, and at most FormValidator::MAX_FILES_PER_FIELD then.
+  it "takes one file for a single-file field, and a capped number for a multiple one" do
+    form.update!(fields: form.fields + [{"name" => "photo", "label" => "Photo", "type" => "file"},
+      {"name" => "plans", "label" => "Plans", "type" => "file", "multiple" => true}])
+    file = -> { Rack::Test::UploadedFile.new(StringIO.new("x"), "text/plain", original_filename: "x.txt") }
+
+    expect { post path, params: {email: "a@b.com", photo: [file.(), file.()]} }.not_to change(FormSubmission, :count)
+    expect(response.parsed_body.dig("errors", "photo")).to include("takes one file")
+
+    expect { post path, params: {email: "a@b.com", plans: Array.new(11) { file.() }} }.not_to change(FormSubmission, :count)
+    expect { post path, params: {email: "a@b.com", plans: [file.(), file.()]} }.to change(FormSubmission, :count).by(1)
+  end
+
+  # Choosing reCAPTCHA used to check nothing: every submission passed.
+  context "with reCAPTCHA chosen and its secret set" do
+    before do
+      Setting.set("forms_settings", {"captcha_provider" => "recaptcha", "recaptcha_site_key" => "6Lc-site"})
+      Setting.set_secret("forms_settings", recaptcha_secret_key: "re-sekret")
+    end
+
+    it "rejects a submission with no token" do
+      expect { post path, params: {email: "a@b.com"} }.not_to change(FormSubmission, :count)
+      expect(response.parsed_body).to eq({"error" => "captcha_failed"})
+    end
+
+    it "verifies the g-recaptcha-response token with Google, and fails a low v3 score" do
+      sent = stub_turnstile(turnstile_answer(success: true))
+      expect {
+        post path, params: {:email => "a@b.com", "g-recaptcha-response" => "re-tok"}
+      }.to change(FormSubmission, :count).by(1)
+      expect(sent[:host]).to eq("www.google.com")
+      expect(URI.decode_www_form(sent[:request].body).to_h).to include("secret" => "re-sekret", "response" => "re-tok")
+
+      low = Net::HTTPOK.new("1.1", "200", "OK").tap { |res| allow(res).to receive(:body).and_return(JSON.generate({"success" => true, "score" => 0.1})) }
+      stub_turnstile(low)
+      expect { post path, params: {:email => "b@b.com", "g-recaptcha-response" => "re-tok"} }.not_to change(FormSubmission, :count)
+    end
+  end
+
   context "with a Turnstile secret configured" do
     before do
       Setting.set("forms_settings", {"captcha_provider" => "turnstile", "turnstile_secret_key" => "sekret"})

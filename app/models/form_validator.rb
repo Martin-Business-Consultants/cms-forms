@@ -6,6 +6,7 @@ class FormValidator
   FIELD_TYPES = %w[text email tel url textarea select radio checkbox file].freeze
   OPTIONED_TYPES = %w[select radio].freeze
   DEFAULT_MAX_FILE_BYTES = 10 * 1024 * 1024
+  MAX_FILES_PER_FIELD = 10
   HONEYPOT_FIELD = "_hp"
 
   class << self
@@ -76,6 +77,14 @@ class FormValidator
             next
           end
           next if uploaded.empty?
+
+          # One file unless the field takes several, and never more than
+          # MAX_FILES_PER_FIELD: a stranger's post can't fill the disk.
+          allowed = fd["multiple"] ? MAX_FILES_PER_FIELD : 1
+          if uploaded.size > allowed
+            (out[name] ||= []) << (allowed == 1 ? "takes one file" : "takes at most #{allowed} files")
+            next
+          end
 
           max_bytes = fd["max_size"].is_a?(Integer) ? fd["max_size"] : DEFAULT_MAX_FILE_BYTES
           accept    = fd["accept"].is_a?(String) ? fd["accept"] : nil
