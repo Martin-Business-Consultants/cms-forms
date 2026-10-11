@@ -6,6 +6,8 @@
     <td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e7e5e4;border-radius:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1c1917;">
 
+        <%# Drawn here, so the core's mail layout doesn't draw it again. %>
+        <% content_for :logo_drawn, "yes" %>
         <% if (logo = logo_src) %>
         <tr>
           <td align="center" style="padding:24px 24px 8px;">

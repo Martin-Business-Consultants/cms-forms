@@ -27,6 +27,7 @@ RSpec.describe FormSubmissionMailer do
     Setting.set("general", {"site_base_url" => "https://www.acme.test"})
 
     mail = sent
+    expect(html(mail).scan("<img").size).to eq(1)
     expect(html(mail)).to include(%(<img src="cid:logo@cms"))
     expect(mail.attachments.sole).to be_inline
     expect(html(mail)).not_to include("acme.test/rails")
