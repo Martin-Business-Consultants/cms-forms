@@ -22,7 +22,20 @@ module FormEmail::Sample
     when "select", "radio" then choices.first
     when "checkbox" then "Yes"
     when "file" then nil
-    else field["name"].to_s.include?("name") ? "Sam Sample" : "Sample #{(field["label"].presence || field["name"]).to_s.downcase}"
+    else name_answer(field["name"].to_s) || "Sample #{(field["label"].presence || field["name"]).to_s.downcase}"
+    end
+  end
+
+  # A name field's part of "Sam Sample": a first name and a last name, set
+  # side by side ({{first_name}} {{last_name}}), read as one name, not twice.
+  def name_answer(name)
+    key = name.downcase
+    return unless key.include?("name")
+
+    if key.match?(/first|given|fore/) then "Sam"
+    elsif key.match?(/last|family|sur/) then "Sample"
+    elsif key.match?(/middle/) then "J."
+    else "Sam Sample"
     end
   end
 end
