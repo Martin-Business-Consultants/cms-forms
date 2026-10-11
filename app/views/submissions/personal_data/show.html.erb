@@ -3,34 +3,34 @@
 <%= render "layouts/shared/page_header", title: @page_title,
       description: "When someone asks what the site holds about them, or to have it deleted: their email address finds every submission that holds it." %>
 
-<section class="<%= ui(:panel, "max-w-3xl space-y-5 p-6") %>">
-  <%= form_with url: submissions_personal_data_path, method: :get, class: "flex flex-wrap gap-2" do |form| %>
-    <%= form.email_field :email, value: @email, required: true, placeholder: "their@email.com", class: "min-w-0 flex-1", aria: { label: "Their email address" } %>
-    <button type="submit" class="<%= ui(:button, :primary) %>">Find</button>
+<section class="panel panel--padded fields measure--lg">
+  <%= form_with url: submissions_personal_data_path, method: :get, class: "cluster" do |form| %>
+    <%= form.email_field :email, value: @email, required: true, placeholder: "their@email.com", class: "grow", aria: { label: "Their email address" } %>
+    <button type="submit" class="btn btn--primary">Find</button>
   <% end %>
 
   <% if @email.present? then %>
     <% if @submissions.empty? then %>
-      <p class="text-sm text-gray-700">No submission holds <strong class="font-semibold"><%= @email %></strong>.</p>
+      <p class="text-body">No submission holds <strong class="text-semibold"><%= @email %></strong>.</p>
     <% else %>
-      <p class="text-sm text-gray-700"><%= pluralize(@submissions.size, "submission") %> hold <strong class="font-semibold"><%= @email %></strong>:</p>
-      <ul class="divide-y divide-gray-100 rounded-lg border border-gray-200 text-sm">
+      <p class="text-body"><%= pluralize(@submissions.size, "submission") %> hold <strong class="text-semibold"><%= @email %></strong>:</p>
+      <ul class="boxed-list">
         <% @submissions.each do |submission| %>
           <%# herb:key submission.id %>
-          <li class="flex flex-wrap justify-between gap-2 px-3 py-2">
-            <span class="font-medium text-gray-900"><%= submission.form&.title || "A deleted form" %></span>
-            <span class="text-gray-500"><%= site_time_tag submission.created_at %><% if submission.files.attached? then %> · <%= pluralize(submission.files.size, "file") %><% end %></span>
+          <li class="cluster cluster--between">
+            <span class="text-medium text-ink"><%= submission.form&.title || "A deleted form" %></span>
+            <span class="text-muted"><%= site_time_tag submission.created_at %><% if submission.files.attached? then %> · <%= pluralize(submission.files.size, "file") %><% end %></span>
           </li>
         <% end %>
       </ul>
-      <div class="flex flex-wrap gap-2">
-        <%= link_to "Download them (JSON)", export_submissions_personal_data_path(email: @email), class: ui(:button), data: { turbo: false } %>
+      <div class="cluster">
+        <%= link_to "Download them (JSON)", export_submissions_personal_data_path(email: @email), class: "btn", data: { turbo: false } %>
         <% if Current.user.can?("submissions:delete") then %>
           <%= button_to "Delete them all", submissions_personal_data_path, method: :delete, params: { email: @email },
-                class: ui(:button, :danger), form: { data: { turbo_confirm: "Delete #{pluralize(@submissions.size, "submission")} and their files? This can't be undone." } } %>
+                class: "btn btn--danger", form: { data: { turbo_confirm: "Delete #{pluralize(@submissions.size, "submission")} and their files? This can't be undone." } } %>
         <% end %>
       </div>
     <% end %>
   <% end %>
-  <p class="<%= ui(:help) %>">The audit log records what was done and how many, not the address.</p>
+  <p class="help">The audit log records what was done and how many, not the address.</p>
 </section>

@@ -4,72 +4,76 @@
     Appearance, Advanced. Which tab and which settings show (they depend on
     the type) is forms/forms.css's, so those blocks carry no display class. %>
 <% name = "form[fields][" + key + "]" %>
-<% field_classes = "flex flex-col gap-1.5" %>
-<% shown_classes = "flex-col gap-1.5" %>
 <div class="form-settings" data-key="<%= key %>" data-forms--builder-target="settings" hidden
      data-action="input->forms--builder#changed change->forms--builder#changed">
-  <div class="form-settings__tab flex-col gap-5" data-tab="general">
-    <label class="<%= field_classes %>">
-      <span class="<%= ui(:label) %>">Field label</span>
-      <%= text_field_tag name + "[label]", field["label"], id: nil, class: "w-full", autocomplete: "off", required: true, data: { role: "label" } %>
+  <div class="form-settings__tab" data-tab="general">
+    <label class="field">
+      <span class="label">Field label</span>
+      <%= text_field_tag name + "[label]", field["label"], id: nil, autocomplete: "off", required: true, data: { role: "label" } %>
     </label>
-    <label class="<%= field_classes %>">
-      <span class="<%= ui(:label) %>">Description</span>
-      <%= text_field_tag name + "[help]", field["help"], id: nil, class: "w-full", placeholder: "Shown under the field", data: { role: "help" } %>
+    <label class="field">
+      <span class="label">Description</span>
+      <%= text_field_tag name + "[help]", field["help"], id: nil, placeholder: "Shown under the field", data: { role: "help" } %>
     </label>
-    <label class="<%= shown_classes %>" data-for="choices">
-      <span class="<%= ui(:label) %>">Choices</span>
-      <%= text_area_tag name + "[options]", FormFields.options_text(field), id: nil, rows: 4, class: "w-full font-mono", data: { role: "options" } %>
-      <span class="<%= ui(:help) %>">One per line: <code class="font-mono">value | label</code>, or just the label.</span>
-    </label>
-    <label class="<%= shown_classes %>" data-for="choices">
-      <span class="<%= ui(:label) %>">Choices from a collection</span>
-      <%= select_tag name + "[options_collection]", form_choice_collection_options(field["options_collection"]), id: nil, class: "w-full", data: { role: "options_collection" } %>
-      <span class="<%= ui(:help) %>">Its published entries come first, in order, then the choices above. A new entry joins the list as it's published.</span>
-    </label>
-    <div class="flex-col gap-5" data-for="file">
-      <label class="<%= field_classes %>">
-        <span class="<%= ui(:label) %>">Accepted files</span>
-        <%= text_field_tag name + "[accept]", field["accept"], id: nil, class: "w-full font-mono", placeholder: ".pdf,.doc,image/*" %>
+    <div data-for="choices">
+      <label class="field">
+        <span class="label">Choices</span>
+        <%= text_area_tag name + "[options]", FormFields.options_text(field), id: nil, rows: 4, class: "text-mono", data: { role: "options" } %>
+        <span class="help">One per line: <code class="code">value | label</code>, or just the label.</span>
       </label>
-      <label class="<%= field_classes %>">
-        <span class="<%= ui(:label) %>">Largest file</span>
-        <%= text_field_tag name + "[max_size]", FormFields.max_size_text(field), id: nil, class: "w-full", placeholder: "10 MB" %>
+      <label class="field">
+        <span class="label">Choices from a collection</span>
+        <%= select_tag name + "[options_collection]", form_choice_collection_options(field["options_collection"]), id: nil, data: { role: "options_collection" } %>
+        <span class="help">Its published entries come first, in order, then the choices above. A new entry joins the list as it's published.</span>
       </label>
-      <label class="flex items-center gap-2 text-sm text-gray-900">
+    </div>
+    <div data-for="file">
+      <label class="field">
+        <span class="label">Accepted files</span>
+        <%= text_field_tag name + "[accept]", field["accept"], id: nil, class: "text-mono", placeholder: ".pdf,.doc,image/*" %>
+      </label>
+      <label class="field">
+        <span class="label">Largest file</span>
+        <%= text_field_tag name + "[max_size]", FormFields.max_size_text(field), id: nil, placeholder: "10 MB" %>
+      </label>
+      <label class="choice">
         <%= check_box_tag name + "[multiple]", "1", field["multiple"] == true, id: nil, data: { role: "multiple" } %>
         <span>Several files</span>
       </label>
     </div>
-    <label class="flex items-center gap-2 text-sm text-gray-900">
+    <label class="choice">
       <%= check_box_tag name + "[required]", "1", field["required"] == true, id: nil, data: { role: "required" } %>
       <span>Required</span>
     </label>
   </div>
 
-  <div class="form-settings__tab flex-col gap-5" data-tab="appearance">
-    <label class="<%= shown_classes %>" data-for="text">
-      <span class="<%= ui(:label) %>">Placeholder</span>
-      <%= text_field_tag name + "[placeholder]", field["placeholder"], id: nil, class: "w-full", data: { role: "placeholder" } %>
-    </label>
-    <p class="text-sm text-gray-500" data-for="no-text">This field has no appearance settings.</p>
+  <div class="form-settings__tab" data-tab="appearance">
+    <div data-for="text">
+      <label class="field">
+        <span class="label">Placeholder</span>
+        <%= text_field_tag name + "[placeholder]", field["placeholder"], id: nil, data: { role: "placeholder" } %>
+      </label>
+    </div>
+    <p class="text-muted" data-for="no-text">This field has no appearance settings.</p>
   </div>
 
-  <div class="form-settings__tab flex-col gap-5" data-tab="advanced">
-    <label class="<%= field_classes %>">
-      <span class="<%= ui(:label) %>">Field type</span>
-      <%= select_tag name + "[type]", options_for_select(form_field_type_options, field["type"]), id: nil, class: "w-full", data: { role: "type" } %>
+  <div class="form-settings__tab" data-tab="advanced">
+    <label class="field">
+      <span class="label">Field type</span>
+      <%= select_tag name + "[type]", options_for_select(form_field_type_options, field["type"]), id: nil, data: { role: "type" } %>
     </label>
-    <label class="<%= field_classes %>">
-      <span class="<%= ui(:label) %>">Field name</span>
-      <%= text_field_tag name + "[name]", field["name"], id: nil, class: "w-full font-mono", placeholder: "email",
+    <label class="field">
+      <span class="label">Field name</span>
+      <%= text_field_tag name + "[name]", field["name"], id: nil, class: "text-mono", placeholder: "email",
             autocomplete: "off", spellcheck: false, required: true, data: { role: "name" } %>
-      <span class="<%= ui(:help) %>">The key the submission stores the answer under. Made from the label until you change it.</span>
+      <span class="help">The key the submission stores the answer under. Made from the label until you change it.</span>
     </label>
-    <label class="<%= shown_classes %>" data-for="text">
-      <span class="<%= ui(:label) %>">Default value</span>
-      <%= text_field_tag name + "[default]", field["default"], id: nil, class: "w-full", data: { role: "default" } %>
-    </label>
+    <div data-for="text">
+      <label class="field">
+        <span class="label">Default value</span>
+        <%= text_field_tag name + "[default]", field["default"], id: nil, data: { role: "default" } %>
+      </label>
+    </div>
   </div>
 
   <%= hidden_field_tag name + "[extra]", FormFields.extra_json(field), id: nil %>

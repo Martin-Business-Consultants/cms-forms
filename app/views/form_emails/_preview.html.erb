@@ -3,14 +3,14 @@
     made-up submission into a half-width sheet's frame. The button posts the
     form there (form_emails/previews) rather than saving it. %>
 <div class="contents" data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
-  <button type="submit" class="<%= ui(:button, :small) %>" formaction="<%= form_email_preview_path(form_slug: email.form.slug, email_kind: email.kind) %>"
+  <button type="submit" class="btn btn--sm" formaction="<%= form_email_preview_path(form_slug: email.form.slug, email_kind: email.kind) %>"
           formtarget="form_email_preview_frame" formnovalidate data-turbo="false" data-action="dialog#open">Preview</button>
-  <dialog class="<%= ui(:sheet, "dialog--sheet-half") %>" data-dialog-target="dialog" aria-label="Preview" closedby="any">
-    <header class="flex items-center justify-between gap-4">
-      <h2 class="text-lg font-semibold text-gray-900">Preview</h2>
-      <button type="button" class="<%= ui(:button, :plain, :small) %>" data-action="dialog#close">Close</button>
+  <dialog class="dialog dialog--sheet dialog--sheet-half" data-dialog-target="dialog" aria-label="Preview" closedby="any">
+    <header class="dialog__header">
+      <h2 class="heading heading--lg">Preview</h2>
+      <button type="button" class="btn btn--plain btn--sm" data-action="dialog#close">Close</button>
     </header>
-    <p class="<%= ui(:help) %>">
+    <p class="help">
       For a made-up submission.
       <% if email.site_template_current? %>
         In the site’s template, as it’s sent now.
@@ -18,6 +18,6 @@
         In the CMS’s layout; the site’s own design shows once its build has made a template of these blocks.
       <% end %>
     </p>
-    <iframe name="form_email_preview_frame" class="min-h-0 w-full flex-1 rounded-lg border border-gray-200 bg-gray-50" title="Email preview"></iframe>
+    <iframe name="form_email_preview_frame" class="forms-email-preview" title="Email preview"></iframe>
   </dialog>
 </div>

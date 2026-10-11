@@ -2,15 +2,15 @@ import { Controller } from "@hotwired/stimulus"
 
 // Classes for the previews drawn here: a field as the site shows it.
 const PREVIEW = {
-  label: "text-sm font-medium text-gray-900",
-  required: "text-red-600",
-  help: "text-xs text-gray-500",
-  choices: "flex flex-col gap-1.5",
-  choice: "flex items-center gap-2 text-sm text-gray-700",
-  file: "rounded-md border border-dashed border-gray-300 p-3.5 text-center text-sm text-gray-500",
+  label: "form-preview__label",
+  required: "form-preview__required",
+  help: "form-preview__help",
+  choices: "form-preview__choices",
+  choice: "form-preview__choice",
+  file: "form-preview__file",
   // Disabled for looking at, but not dimmed as base.css dims a disabled control.
-  control: "w-full opacity-100",
-  check: "opacity-100"
+  control: "form-preview__control",
+  check: "form-preview__check"
 }
 
 // The form builder (forms/edit), after Payload's form builder: the fields as
@@ -135,7 +135,7 @@ export default class extends Controller {
   paletteDragStart(event) {
     this.dragging = { type: event.currentTarget.dataset.type, label: event.currentTarget.dataset.label }
     this.placeholder = document.createElement("li")
-    this.placeholder.className = "form-card form-card--placeholder h-14 rounded-lg border-2 border-dashed"
+    this.placeholder.className = "form-card form-card--placeholder"
     event.dataTransfer.effectAllowed = "copy"
     event.dataTransfer.setData("text/plain", "")
   }

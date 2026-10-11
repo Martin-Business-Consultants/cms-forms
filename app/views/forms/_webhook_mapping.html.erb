@@ -4,13 +4,13 @@
     value). Posted as form[webhook_body][mappings][<row id>][…]. %>
 <% name = "form[webhook_body][mappings][" + key + "]" %>
 <% fields = Array(record.fields).select { it.is_a?(Hash) && it["name"].present? } %>
-<li class="webhook-map__row flex items-center gap-2" data-sortable-list-target="item">
-  <span class="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
-    <label class="sr-only" for="<%= "webhook_key_" + key %>">Key</label>
-    <%= text_field_tag name + "[key]", mapping["key"], id: "webhook_key_" + key, class: "w-full font-mono", placeholder: "email_address",
+<li class="forms-webhook-map__row row" data-sortable-list-target="item">
+  <span class="forms-webhook-map__cells">
+    <label class="visually-hidden" for="<%= "webhook_key_" + key %>">Key</label>
+    <%= text_field_tag name + "[key]", mapping["key"], id: "webhook_key_" + key, class: "text-mono", placeholder: "email_address",
           autocomplete: "off", spellcheck: false %>
-    <label class="sr-only" for="<%= "webhook_source_" + key %>">Value</label>
-    <select name="<%= name %>[source]" id="<%= "webhook_source_" + key %>" class="w-full">
+    <label class="visually-hidden" for="<%= "webhook_source_" + key %>">Value</label>
+    <select name="<%= name %>[source]" id="<%= "webhook_source_" + key %>">
       <% if fields.any? %>
         <optgroup label="Form fields">
           <% fields.each do |field| %>
@@ -27,12 +27,12 @@
       </optgroup>
       <%= tag.option "Custom value…", value: "custom", selected: mapping["source"] == "custom" %>
     </select>
-    <label class="sr-only" for="<%= "webhook_value_" + key %>">Custom value</label>
-    <%= text_field_tag name + "[value]", mapping["value"], id: "webhook_value_" + key, class: "webhook-map__custom w-full",
+    <label class="visually-hidden" for="<%= "webhook_value_" + key %>">Custom value</label>
+    <%= text_field_tag name + "[value]", mapping["value"], id: "webhook_value_" + key, class: "forms-webhook-map__custom",
           placeholder: "Website: {{form_title}}", autocomplete: "off" %>
   </span>
-  <button type="button" class="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-gray-500 hover:bg-red-50 hover:text-red-700" title="Remove this key" data-action="sortable-list#remove">
-    <%= icon_tag "trash", class: "size-4" %>
-    <span class="sr-only">Remove this key</span>
+  <button type="button" class="btn btn--plain btn--icon row-moves__remove no-shrink" title="Remove this key" data-action="sortable-list#remove">
+    <%= icon_tag "trash" %>
+    <span class="visually-hidden">Remove this key</span>
   </button>
 </li>

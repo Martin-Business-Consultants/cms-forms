@@ -5,15 +5,15 @@
 <% content_for :page_actions do %>
   <% if can_write %>
     <%= form_with url: forms_import_path, class: "contents", data: { controller: "form" } do |form| %>
-      <label class="<%= ui(:button) %>" title="Import forms from an export">
+      <label class="btn" title="Import forms from an export">
         <span>Import JSON</span>
         <%= form.file_field :file, accept: ".json,application/json", hidden: true, data: { action: "change->form#submit" } %>
       </label>
     <% end %>
   <% end %>
-  <%= link_to "Export", forms_export_path, class: ui(:button), data: { turbo: false } %>
+  <%= link_to "Export", forms_export_path, class: "btn", data: { turbo: false } %>
   <% if Current.user.can?("forms:read") %>
-    <%= link_to "Settings", settings_forms_path, class: ui(:button) %>
+    <%= link_to "Settings", settings_forms_path, class: "btn" %>
   <% end %>
   <% if can_write %>
     <%= render "forms/new_form", form_record: @new_form || Form.new(status: "draft", submit_label: "Submit"), open: @new_form.present? %>
@@ -25,39 +25,39 @@
   <%= render "layouts/shared/bulk_actions", id: "forms_bulk", noun: "form", deletion_path: forms_bulk_deletions_path %>
 <% end %>
 
-<section class="<%= ui(:panel, "overflow-x-auto") %>" data-controller="select-all">
-  <table class="data-table <%= ui(:table) %>">
+<section class="panel panel--scroll" data-controller="select-all">
+  <table class="data-table">
     <thead>
       <tr>
         <% if can_delete %>
-          <th class="<%= ui(:th, "data-table__check") %>"><% if @forms.any? %><input type="checkbox" aria-label="Select every row" data-select-all-target="all" data-action="select-all#toggle"><% end %></th>
+          <th class="data-table__check"><% if @forms.any? %><input type="checkbox" aria-label="Select every row" data-select-all-target="all" data-action="select-all#toggle"><% end %></th>
         <% end %>
-        <th class="<%= ui(:th, "w-px whitespace-nowrap") %>">Active</th>
-        <th class="<%= ui(:th) %>">Title</th>
-        <th class="<%= ui(:th, "text-right") %>">ID</th>
-        <th class="<%= ui(:th, "text-right") %>">Fields</th>
-        <th class="<%= ui(:th, "text-right") %>">Entries</th>
-        <th class="<%= ui(:th) %>">Last entry</th>
+        <th class="forms-active-column">Active</th>
+        <th>Title</th>
+        <th class="data-table__num">ID</th>
+        <th class="data-table__num">Fields</th>
+        <th class="data-table__num">Entries</th>
+        <th>Last entry</th>
       </tr>
     </thead>
     <tbody>
       <% @forms.each do |form| %>
         <%# herb:key form.id %>
-        <tr id="<%= dom_id(form) %>" class="hover:bg-gray-50" data-filter-target="item">
+        <tr id="<%= dom_id(form) %>" data-filter-target="item">
           <% if can_delete %>
-            <td class="<%= ui(:td, "data-table__check") %>"><input type="checkbox" data-select-all-target="box" data-action="select-all#sync" name="slugs[]" value="<%= form.slug %>" form="forms_bulk" aria-label="Select <%= form.title %>"></td>
+            <td class="data-table__check"><input type="checkbox" data-select-all-target="box" data-action="select-all#sync" name="slugs[]" value="<%= form.slug %>" form="forms_bulk" aria-label="Select <%= form.title %>"></td>
           <% end %>
-          <td class="<%= ui(:td, "w-px whitespace-nowrap") %>">
+          <td class="forms-active-column">
             <%= render "forms/activation", form: form, can_write: can_write %>
           </td>
-          <td class="<%= ui(:td) %>">
-            <span class="flex flex-wrap items-center gap-2">
-              <%= link_to form.title, (can_write ? edit_form_path(form.slug) : form_path(form.slug)), class: "font-medium text-gray-900 hover:underline" %>
+          <td>
+            <span class="cluster">
+              <%= link_to form.title, (can_write ? edit_form_path(form.slug) : form_path(form.slug)), class: "title-link" %>
               <% if form.status == "archived" %>
                 <%= status_tag "archived" %>
               <% end %>
             </span>
-            <div class="font-mono text-xs text-gray-500"><%= form.slug %></div>
+            <div class="text-mono text-small text-muted"><%= form.slug %></div>
             <%= render "layouts/shared/row_links", name: form.title,
                 edit_path: (edit_form_path(form.slug) if can_write),
                 links: [ [ "Entries", form_path(form.slug) ] ],
@@ -65,11 +65,11 @@
                 delete_path: (form_path(form.slug) if can_delete), delete_label: "Trash",
                 delete_message: "It goes to the trash, where it can be restored. The site’s posts to it fail until then." %>
           </td>
-          <td class="<%= ui(:td, "text-right tabular-nums") %>"><span class="text-gray-500"><%= form.id %></span></td>
-          <td class="<%= ui(:td, "text-right tabular-nums") %>"><%= Array(form.fields).size %></td>
-          <td class="<%= ui(:td, "text-right tabular-nums") %>"><%= link_to @submission_counts.fetch(form.id, 0), form_path(form.slug), class: ui(:link) %></td>
-          <td class="<%= ui(:td) %>">
-            <span class="whitespace-nowrap text-xs text-gray-500">
+          <td class="data-table__num"><span class="text-muted"><%= form.id %></span></td>
+          <td class="data-table__num"><%= Array(form.fields).size %></td>
+          <td class="data-table__num"><%= link_to @submission_counts.fetch(form.id, 0), form_path(form.slug), class: "link" %></td>
+          <td>
+            <span class="nowrap text-small text-muted">
               <% if (last = @last_submissions[form.id]) %>
                 <%= time_ago_tag last %>
               <% else %>

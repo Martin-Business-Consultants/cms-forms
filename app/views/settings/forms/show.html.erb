@@ -7,60 +7,60 @@
 <% end %>
 
 <%= form_with url: settings_forms_path, id: "settings_form", method: :patch, scope: :settings do |form| %>
-  <%= tag.fieldset class: "space-y-6", disabled: !can_write do %>
-    <section class="<%= ui(:panel, "space-y-5 p-6") %>">
-      <div class="space-y-1">
-        <h2 class="<%= ui(:heading) %>">Sender</h2>
-        <p class="text-sm text-gray-500">Who every email from the site comes from: form notifications and confirmations, and the CMS's own (password resets, collection notifications). Which server sends them is Settings › Email delivery.</p>
+  <%= tag.fieldset class: "stack stack--lg", disabled: !can_write do %>
+    <section class="panel panel--padded fields">
+      <div class="stack stack--xs">
+        <h2 class="heading">Sender</h2>
+        <p class="text-muted">Who every email from the site comes from: form notifications and confirmations, and the CMS's own (password resets, collection notifications). Which server sends them is Settings › Email delivery.</p>
       </div>
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div class="grid grid--2 fields-grid">
         <%= settings_field "From name" do %>
-          <%= form.text_field :from_name, value: @settings["from_name"], class: "w-full", placeholder: "Old Mill Forms" %>
+          <%= form.text_field :from_name, value: @settings["from_name"], placeholder: "Old Mill Forms" %>
         <% end %>
         <%= settings_field "From address" do %>
-          <%= form.email_field :from_email, value: @settings["from_email"], class: "w-full", placeholder: "forms@example.com" %>
+          <%= form.email_field :from_email, value: @settings["from_email"], placeholder: "forms@example.com" %>
         <% end %>
       </div>
     </section>
 
-    <section class="<%= ui(:panel, "space-y-5 p-6") %>">
-      <div class="space-y-1">
-        <h2 class="<%= ui(:heading) %>">Keeping submissions</h2>
-        <p class="text-sm text-gray-500">Submissions hold what people tell you about themselves. Keep them only as long as you need them: older ones are deleted each night, with their files. Someone’s data on request: Submissions › Personal data.</p>
+    <section class="panel panel--padded fields">
+      <div class="stack stack--xs">
+        <h2 class="heading">Keeping submissions</h2>
+        <p class="text-muted">Submissions hold what people tell you about themselves. Keep them only as long as you need them: older ones are deleted each night, with their files. Someone’s data on request: Submissions › Personal data.</p>
       </div>
       <%= settings_field "Keep submissions for" do %>
-        <%= form.select :retention_days, FormSubmission::RETENTION_CHOICES.invert.to_a, { selected: @settings["retention_days"] }, class: "w-full" %>
+        <%= form.select :retention_days, FormSubmission::RETENTION_CHOICES.invert.to_a, { selected: @settings["retention_days"] } %>
       <% end %>
     </section>
 
-    <section class="<%= ui(:panel, "space-y-5 p-6") %>">
-      <div class="space-y-1">
-        <h2 class="<%= ui(:heading) %>">Spam protection</h2>
-        <p class="text-sm text-gray-500">A submission has to pass this check before it reaches the inbox. The site shows the widget with the site key.</p>
+    <section class="panel panel--padded fields">
+      <div class="stack stack--xs">
+        <h2 class="heading">Spam protection</h2>
+        <p class="text-muted">A submission has to pass this check before it reaches the inbox. The site shows the widget with the site key.</p>
       </div>
-      <div class="space-y-5" data-controller="forms--captcha-settings">
+      <div class="fields" data-controller="forms--captcha-settings">
         <%= settings_field "Check with" do %>
-          <%= form.select :captcha_provider, Settings::FormsController::CAPTCHA_PROVIDERS.invert.to_a, { selected: @settings["captcha_provider"] }, class: "w-full", data: { "forms--captcha-settings-target": "provider", action: "forms--captcha-settings#show" } %>
+          <%= form.select :captcha_provider, Settings::FormsController::CAPTCHA_PROVIDERS.invert.to_a, { selected: @settings["captcha_provider"] }, data: { "forms--captcha-settings-target": "provider", action: "forms--captcha-settings#show" } %>
         <% end %>
-        <%= tag.div class: "space-y-5", hidden: @settings["captcha_provider"] != "turnstile", data: { "forms--captcha-settings-target": "group", provider: "turnstile" } do %>
-          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <%= tag.div class: "fields", hidden: @settings["captcha_provider"] != "turnstile", data: { "forms--captcha-settings-target": "group", provider: "turnstile" } do %>
+          <div class="grid grid--2 fields-grid">
             <%= settings_field "Turnstile site key" do %>
-              <%= form.text_field :turnstile_site_key, value: @settings["turnstile_site_key"], class: "w-full font-mono", autocomplete: "off" %>
+              <%= form.text_field :turnstile_site_key, value: @settings["turnstile_site_key"], class: "text-mono", autocomplete: "off" %>
             <% end %>
             <%= settings_field "Turnstile secret key" do %>
-              <%= form.password_field :turnstile_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["turnstile_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+              <%= form.password_field :turnstile_secret_key, class: "text-mono", autocomplete: "new-password", placeholder: (@secrets_set["turnstile_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
             <% end %>
           </div>
           <%= settings_field "Appearance", hint: "Match the visitor's light or dark setting, or always draw the check light or dark." do %>
-            <%= form.select :captcha_theme, Settings::FormsController::CAPTCHA_THEMES.invert.to_a, { selected: @settings["captcha_theme"] }, class: "w-full" %>
+            <%= form.select :captcha_theme, Settings::FormsController::CAPTCHA_THEMES.invert.to_a, { selected: @settings["captcha_theme"] } %>
           <% end %>
         <% end %>
-        <%= tag.div class: "grid grid-cols-1 gap-5 sm:grid-cols-2", hidden: @settings["captcha_provider"] != "recaptcha", data: { "forms--captcha-settings-target": "group", provider: "recaptcha" } do %>
+        <%= tag.div class: "grid grid--2 fields-grid", hidden: @settings["captcha_provider"] != "recaptcha", data: { "forms--captcha-settings-target": "group", provider: "recaptcha" } do %>
           <%= settings_field "reCAPTCHA site key" do %>
-            <%= form.text_field :recaptcha_site_key, value: @settings["recaptcha_site_key"], class: "w-full font-mono", autocomplete: "off" %>
+            <%= form.text_field :recaptcha_site_key, value: @settings["recaptcha_site_key"], class: "text-mono", autocomplete: "off" %>
           <% end %>
           <%= settings_field "reCAPTCHA secret key" do %>
-            <%= form.password_field :recaptcha_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["recaptcha_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+            <%= form.password_field :recaptcha_secret_key, class: "text-mono", autocomplete: "new-password", placeholder: (@secrets_set["recaptcha_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
           <% end %>
         <% end %>
       </div>
