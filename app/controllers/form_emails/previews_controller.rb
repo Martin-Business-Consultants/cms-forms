@@ -10,6 +10,13 @@ class FormEmails::PreviewsController < ApplicationController
 
   requires_capability "forms:write", only: [:create, :update]
 
+  # The Preview button sends the email's own form here (formaction), whose
+  # authenticity token Rails made for the form's address (per-form tokens),
+  # not this one, so it was refused (422). A preview saves nothing and its
+  # answer only goes back to the page that asked, which no other site can
+  # read; it still takes a signed-in person who can write forms.
+  skip_forgery_protection only: [:create, :update]
+
   def create
     email = @form.emails.find_by!(kind: params[:email_kind])
     email.assign_attributes(email_attributes(email))
