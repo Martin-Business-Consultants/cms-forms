@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 # The Forms plugin's Stimulus controllers, loaded with the admin's own
-# (controllers/index.js loads every pin under "controllers"): forms--builder.
+# (controllers/index.js loads every pin under "controllers"): forms--builder,
+# forms--captcha-settings.
 pin_all_from Forms::Engine.root.join("app/javascript/controllers/forms"), under: "controllers/forms", to: "controllers/forms"

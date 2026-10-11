@@ -25,11 +25,15 @@ RSpec.describe "Delivery API v1: forms", type: :request do
     form = json["data"].sole
     expect(form).to include("slug" => "contact", "honeypot" => "_hp",
       "action" => "http://example.com/api/forms/contact/submissions",
-      "captcha" => {"provider" => "turnstile", "site_key" => "0x4AAA"})
+      "captcha" => {"provider" => "turnstile", "site_key" => "0x4AAA", "theme" => "auto"})
     expect(response.body).not_to include("0x4SECRET")
 
     get "/api/v1/site", headers: token
     expect(json.dig("data", "plugin_config", "forms", "captcha", "site_key")).to eq("0x4AAA")
+
+    Setting.set("forms_settings", captcha_theme: "dark")
+    get "/api/v1/forms", headers: token
+    expect(json["data"].sole.dig("captcha", "theme")).to eq("dark")
   end
 
   it "has no captcha until both its keys are set, and hides drafts" do

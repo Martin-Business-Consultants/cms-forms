@@ -214,10 +214,21 @@ RSpec.describe "The Forms plugin", type: :request do
       get settings_forms_path
       expect(response).to have_http_status(:ok)
 
-      patch settings_forms_path, params: {settings: {from_name: "Old Mill", captcha_provider: "turnstile", turnstile_secret_key: "sekret"}}
+      patch settings_forms_path, params: {settings: {from_name: "Old Mill", captcha_provider: "turnstile", captcha_theme: "dark", turnstile_secret_key: "sekret"}}
 
-      expect(Setting.get("forms_settings")).to include("from_name" => "Old Mill", "captcha_provider" => "turnstile")
+      expect(Setting.get("forms_settings")).to include("from_name" => "Old Mill", "captcha_provider" => "turnstile", "captcha_theme" => "dark")
       expect(TurnstileVerifier.from_settings).not_to be_nil
+    end
+
+    it "shows only the chosen provider's keys" do
+      Setting.set("forms_settings", {"captcha_provider" => "turnstile"})
+
+      get settings_forms_path
+
+      page = Nokogiri::HTML(response.body)
+      expect(page.at_css("[data-provider=turnstile]")["hidden"]).to be_nil
+      expect(page.at_css("[data-provider=recaptcha]")["hidden"]).not_to be_nil
+      expect(page.at_css("[data-provider=turnstile] select[name='settings[captcha_theme]']")).to be_present
     end
 
     it "keeps captcha secrets encrypted, never shows them, and keeps them when the field is left blank" do

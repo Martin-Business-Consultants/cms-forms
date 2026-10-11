@@ -28,21 +28,30 @@
         <h2 class="<%= ui(:heading) %>">Spam protection</h2>
         <p class="text-sm text-gray-500">A submission has to pass this check before it reaches the inbox. The site shows the widget with the site key.</p>
       </div>
-      <%= settings_field "Check with" do %>
-        <%= form.select :captcha_provider, Settings::FormsController::CAPTCHA_PROVIDERS.invert.to_a, { selected: @settings["captcha_provider"] }, class: "w-full" %>
-      <% end %>
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <%= settings_field "Turnstile site key" do %>
-          <%= form.text_field :turnstile_site_key, value: @settings["turnstile_site_key"], class: "w-full font-mono", autocomplete: "off" %>
+      <div class="space-y-5" data-controller="forms--captcha-settings">
+        <%= settings_field "Check with" do %>
+          <%= form.select :captcha_provider, Settings::FormsController::CAPTCHA_PROVIDERS.invert.to_a, { selected: @settings["captcha_provider"] }, class: "w-full", data: { "forms--captcha-settings-target": "provider", action: "forms--captcha-settings#show" } %>
         <% end %>
-        <%= settings_field "Turnstile secret key" do %>
-          <%= form.password_field :turnstile_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["turnstile_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+        <%= tag.div class: "space-y-5", hidden: @settings["captcha_provider"] != "turnstile", data: { "forms--captcha-settings-target": "group", provider: "turnstile" } do %>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <%= settings_field "Turnstile site key" do %>
+              <%= form.text_field :turnstile_site_key, value: @settings["turnstile_site_key"], class: "w-full font-mono", autocomplete: "off" %>
+            <% end %>
+            <%= settings_field "Turnstile secret key" do %>
+              <%= form.password_field :turnstile_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["turnstile_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+            <% end %>
+          </div>
+          <%= settings_field "Appearance", hint: "Match the visitor's light or dark setting, or always draw the check light or dark." do %>
+            <%= form.select :captcha_theme, Settings::FormsController::CAPTCHA_THEMES.invert.to_a, { selected: @settings["captcha_theme"] }, class: "w-full" %>
+          <% end %>
         <% end %>
-        <%= settings_field "reCAPTCHA site key" do %>
-          <%= form.text_field :recaptcha_site_key, value: @settings["recaptcha_site_key"], class: "w-full font-mono", autocomplete: "off" %>
-        <% end %>
-        <%= settings_field "reCAPTCHA secret key" do %>
-          <%= form.password_field :recaptcha_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["recaptcha_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+        <%= tag.div class: "grid grid-cols-1 gap-5 sm:grid-cols-2", hidden: @settings["captcha_provider"] != "recaptcha", data: { "forms--captcha-settings-target": "group", provider: "recaptcha" } do %>
+          <%= settings_field "reCAPTCHA site key" do %>
+            <%= form.text_field :recaptcha_site_key, value: @settings["recaptcha_site_key"], class: "w-full font-mono", autocomplete: "off" %>
+          <% end %>
+          <%= settings_field "reCAPTCHA secret key" do %>
+            <%= form.password_field :recaptcha_secret_key, class: "w-full font-mono", autocomplete: "new-password", placeholder: (@secrets_set["recaptcha_secret_key"] ? "Saved — leave blank to keep" : ""), data: { "1p-ignore": true } %>
+          <% end %>
         <% end %>
       </div>
     </section>
