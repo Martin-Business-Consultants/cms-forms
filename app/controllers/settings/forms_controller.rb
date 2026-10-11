@@ -3,7 +3,8 @@
 # Settings › Forms: who form emails come from, and the spam check a public
 # submission has to pass (TurnstileVerifier). Stored in the `forms_settings`
 # setting, which the mailers and the submission endpoint read; the captcha
-# secret keys in its encrypted `secrets`, never shown again once saved.
+# secret keys in its encrypted `secrets`, never shown again once saved. Saving
+# with a check on asks its provider whether it knows the secret.
 class Settings::FormsController < Settings::BaseController
   include PluginGated
   plugin :forms
@@ -38,6 +39,13 @@ class Settings::FormsController < Settings::BaseController
       Setting.unset(SETTING_KEY, *secrets.keys)
     end
     Event.record("settings.forms_updated", fields: attrs.keys + secrets.keys)
-    redirect_to settings_forms_path, notice: "Form settings saved"
+    verifier = TurnstileVerifier.for_settings
+    if verifier&.secret_recognised? == false
+      provider = CAPTCHA_PROVIDERS.fetch(verifier.is_a?(RecaptchaVerifier) ? "recaptcha" : "turnstile")
+      redirect_to settings_forms_path, alert: "Saved, but #{provider} doesn't recognise the secret key, so every submission " \
+        "will be turned away. Copy the secret key that goes with the site key above, and save it here again."
+    else
+      redirect_to settings_forms_path, notice: "Form settings saved"
+    end
   end
 end

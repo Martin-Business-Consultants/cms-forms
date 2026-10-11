@@ -211,6 +211,7 @@ RSpec.describe "The Forms plugin", type: :request do
     end
 
     it "keeps the sender and spam settings in Settings › Forms" do
+      allow_any_instance_of(TurnstileVerifier).to receive(:secret_recognised?).and_return(true)
       get settings_forms_path
       expect(response).to have_http_status(:ok)
 
@@ -218,6 +219,26 @@ RSpec.describe "The Forms plugin", type: :request do
 
       expect(Setting.get("forms_settings")).to include("from_name" => "Old Mill", "captcha_provider" => "turnstile", "captcha_theme" => "dark")
       expect(TurnstileVerifier.from_settings).not_to be_nil
+      expect(flash[:notice]).to eq("Form settings saved")
+    end
+
+    # A secret from another widget turns every submission away as a failed
+    # challenge; saving is where it can be caught.
+    it "says so when Cloudflare doesn't recognise the Turnstile secret" do
+      allow_any_instance_of(TurnstileVerifier).to receive(:secret_recognised?).and_return(false)
+
+      patch settings_forms_path, params: {settings: {captcha_provider: "turnstile", turnstile_secret_key: "wrong"}}
+
+      expect(Forms.captcha_secret("turnstile_secret_key")).to eq("wrong")
+      expect(flash[:alert]).to include("Cloudflare Turnstile doesn't recognise the secret key")
+    end
+
+    it "saves as usual when Cloudflare can't be asked about the secret" do
+      allow_any_instance_of(TurnstileVerifier).to receive(:secret_recognised?).and_return(nil)
+
+      patch settings_forms_path, params: {settings: {captcha_provider: "turnstile", turnstile_secret_key: "sekret"}}
+
+      expect(flash[:notice]).to eq("Form settings saved")
     end
 
     it "shows only the chosen provider's keys" do
@@ -232,6 +253,7 @@ RSpec.describe "The Forms plugin", type: :request do
     end
 
     it "keeps captcha secrets encrypted, never shows them, and keeps them when the field is left blank" do
+      allow_any_instance_of(TurnstileVerifier).to receive(:secret_recognised?).and_return(true)
       Setting.set("forms_settings", {"turnstile_secret_key" => "old-plain"})
 
       patch settings_forms_path, params: {settings: {captcha_provider: "turnstile", turnstile_secret_key: "zq-s3cr3t-77", recaptcha_secret_key: ""}}

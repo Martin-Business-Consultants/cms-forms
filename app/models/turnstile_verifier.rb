@@ -47,6 +47,32 @@ class TurnstileVerifier
   def verify(token, remote_ip: nil)
     return false if token.blank?
 
+    answer = siteverify(token, remote_ip) or return false
+    return true if passed?(answer)
+
+    # Why, in the log: a secret that isn't this widget's ("invalid-input-secret")
+    # turns away every submission and looks just like a failed challenge.
+    Rails.logger.warn("[forms] #{self.class.name} turned the token away: #{Array(answer["error-codes"]).join(", ").presence || answer.except("success").to_json}")
+    false
+  end
+
+  # Whether the provider knows the secret, asked with a token that can't pass:
+  # it answers "invalid-input-secret" for a wrong secret and
+  # "invalid-input-response" for a right one. nil when it couldn't be asked.
+  def secret_recognised?
+    answer = siteverify("not-a-token", nil) or return nil
+    !Array(answer["error-codes"]).include?("invalid-input-secret")
+  end
+
+  # The token, from whichever of the provider's names the page used.
+  def token_from(params) = self.class::TOKEN_PARAMS.lazy.map { params[it].presence }.find(&:itself)
+
+  private
+
+  def passed?(answer) = answer["success"] == true
+
+  # The provider's answer, or nil when it couldn't be had.
+  def siteverify(token, remote_ip)
     form = {"secret" => @secret, "response" => token.to_s}
     form["remoteip"] = remote_ip if remote_ip.present?
 
@@ -56,18 +82,9 @@ class TurnstileVerifier
       req.set_form_data(form)
       http.request(req)
     end
-    return false unless response.is_a?(Net::HTTPSuccess)
-
-    passed?(JSON.parse(response.body))
+    JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
   rescue StandardError => e
     Rails.logger.warn("[forms] #{self.class.name} verification error: #{e.class}: #{e.message}")
-    false
+    nil
   end
-
-  # The token, from whichever of the provider's names the page used.
-  def token_from(params) = self.class::TOKEN_PARAMS.lazy.map { params[it].presence }.find(&:itself)
-
-  private
-
-  def passed?(answer) = answer["success"] == true
 end

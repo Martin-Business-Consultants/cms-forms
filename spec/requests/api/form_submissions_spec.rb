@@ -10,9 +10,9 @@ RSpec.describe "API form submissions", type: :request do
 
   let(:path) { "/api/forms/contact/submissions" }
 
-  def turnstile_answer(success:)
+  def turnstile_answer(success:, codes: [])
     Net::HTTPOK.new("1.1", "200", "OK").tap { |res|
-      allow(res).to receive(:body).and_return(JSON.generate({"success" => success}))
+      allow(res).to receive(:body).and_return(JSON.generate({"success" => success, "error-codes" => codes}))
     }
   end
 
@@ -126,6 +126,29 @@ RSpec.describe "API form submissions", type: :request do
       }.not_to change(FormSubmission, :count)
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.parsed_body).to eq({"error" => "captcha_failed"})
+    end
+
+    it "logs why Cloudflare turned a token away" do
+      stub_turnstile(turnstile_answer(success: false, codes: ["invalid-input-secret"]))
+      allow(Rails.logger).to receive(:warn)
+
+      post path, params: {:email => "a@b.com", "cf-turnstile-response" => "tok"}
+
+      expect(response.parsed_body).to eq({"error" => "captcha_failed"})
+      expect(Rails.logger).to have_received(:warn).with("[forms] TurnstileVerifier turned the token away: invalid-input-secret")
+    end
+
+    it "tells a secret Cloudflare knows from one it doesn't" do
+      verifier = TurnstileVerifier.new("sekret")
+
+      stub_turnstile(turnstile_answer(success: false, codes: ["invalid-input-response"]))
+      expect(verifier.secret_recognised?).to be(true)
+
+      stub_turnstile(turnstile_answer(success: false, codes: ["invalid-input-secret"]))
+      expect(verifier.secret_recognised?).to be(false)
+
+      allow(Net::HTTP).to receive(:start).and_raise(Net::OpenTimeout)
+      expect(verifier.secret_recognised?).to be_nil
     end
 
     it "fails closed when Cloudflare can't be reached" do
