@@ -5,6 +5,10 @@ require "rails_helper"
 # The delivery API's forms: what a site needs to render a form and post it
 # straight to the CMS, Turnstile included.
 RSpec.describe "Delivery API v1: forms", type: :request do
+  # Forms' delivery listing is a frontend's, on while the site is served over
+  # the API (Serving, in a core that has it).
+  before { serve_over_api if respond_to?(:serve_over_api) }
+
   let(:admin) { create(:user) }
   let(:token) { {"Authorization" => "Bearer #{admin.api_token.token}"} }
 
