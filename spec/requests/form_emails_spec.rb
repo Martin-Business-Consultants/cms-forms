@@ -61,6 +61,18 @@ RSpec.describe "Form emails", type: :request do
       expect(email.reload.blocks.first.dig("data", "text")).to eq("New submission to {{form_title}}")
     end
 
+    it "draws the logo the email carries inline in the preview" do
+      logo = Asset.create!(folder: "/", file: {io: StringIO.new("PNG"), filename: "logo.png", content_type: "image/png"})
+      Setting.set("branding", {"logo_id" => logo.id.to_s})
+
+      post form_email_preview_path(form_slug: form.slug, email_kind: "notification"), params: {form_email: {blocks: {
+        "_list" => "1", "r1" => {"type" => "email_heading", "version" => "1", "data" => {"text" => "Hi", "level" => "h1", "align" => "left"}}
+      }}}
+
+      expect(response.body).to include(%(src="data:image/png;base64,#{Base64.strict_encode64("PNG")}"))
+      expect(response.body).not_to include("cid:", "Content-Type: multipart")
+    end
+
     it "sends a test of the saved email to whoever asks" do
       expect { post form_email_test_path(form_slug: form.slug, email_kind: "notification") }
         .to change { ActionMailer::Base.deliveries.size }.by(1)

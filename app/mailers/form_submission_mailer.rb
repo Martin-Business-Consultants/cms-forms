@@ -27,13 +27,12 @@ class FormSubmissionMailer < ApplicationMailer
 
     @subject  = @form_email.render(@form_email.subject, @submission)
     @blocks   = @form_email.content_blocks
-    @logo_url = compute_logo_url
 
     headers = {from: "\"#{from_name}\" <#{from_email}>", to: recipients, subject: @subject.presence || default_subject_for(@form_email)}
     # The site's own design once its build has sent a template for these
     # blocks (FormEmail::SiteTemplate); the CMS's layout until then.
     if @form_email.site_template_current?
-      html = @form_email.fill_site_template(@submission)
+      html = @form_email.fill_site_template(@submission, logo_src: -> { logo_src })
       mail(headers) { |format| format.html { render html: html.html_safe, layout: false } }
     else
       mail(headers)
@@ -44,6 +43,17 @@ class FormSubmissionMailer < ApplicationMailer
 
   def default_subject_for(form_email)
     form_email.notification? ? "[#{@form.title}] New submission ##{@submission.id}" : "Thanks for your submission"
+  end
+
+  helper_method :logo_src
+
+  # The Branding logo for an <img src>: attached inline (cid:) on a core
+  # that does that (ApplicationMailer#email_logo_src, 1.20), so it shows in
+  # clients that won't fetch remote images; on an older core, linked.
+  def logo_src
+    return @logo_src if defined?(@logo_src)
+
+    @logo_src = ApplicationMailer.private_method_defined?(:email_logo_src) ? email_logo_src : compute_logo_url
   end
 
   # The branding logo as an absolute URL on the CMS itself (APP_HOST,

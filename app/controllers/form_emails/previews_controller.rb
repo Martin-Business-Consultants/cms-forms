@@ -16,9 +16,21 @@ class FormEmails::PreviewsController < ApplicationController
     message = FormSubmissionMailer.with(form_email: email, submission: FormEmail::Sample.submission(@form),
       recipients: ["preview@example.com"]).deliver
 
-    render html: message.body.decoded.html_safe, layout: false
+    render html: browser_html(message).html_safe, layout: false
   end
 
   # The editor's form carries _method=patch; a preview is the same either way.
   alias_method :update, :create
+
+  private
+
+  # The message's HTML with what it carries inline (the logo, cid:) as data:
+  # URIs, which a browser can draw.
+  def browser_html(message)
+    html = (message.html_part || message).body.decoded
+    message.attachments.select(&:inline?).reduce(html) do |drawn, attachment|
+      drawn.gsub("cid:#{attachment.content_id.to_s.delete("<>")}",
+        "data:#{attachment.mime_type};base64,#{Base64.strict_encode64(attachment.decoded)}")
+    end
+  end
 end

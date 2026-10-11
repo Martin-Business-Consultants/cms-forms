@@ -9,23 +9,55 @@ RSpec.describe FormSubmissionMailer do
   end
   let(:submission) { form.submissions.create!(data: {"email" => "al@b.test"}, meta: {}, ip: "1.2.3.4") }
 
-  def html
-    described_class.with(form_email: form.notification_email, submission: submission, recipients: ["ops@x.test"])
-      .deliver.body.decoded
+  def sent
+    described_class.with(form_email: form.notification_email, submission: submission, recipients: ["ops@x.test"]).deliver
   end
 
-  # The logo is a CMS file, so it's linked on the CMS (APP_HOST, example.com
-  # in tests). The public website (Settings › General) doesn't serve it.
-  it "links the branding logo on the CMS itself, not the public site" do
+  def html(mail = sent) = (mail.html_part || mail).body.decoded
+
+  def logo!
     logo = Asset.create!(folder: "/", file: {io: StringIO.new("PNG"), filename: "logo.png", content_type: "image/png"})
     Setting.set("branding", {"logo_id" => logo.id.to_s})
+  end
+
+  # Inline (cid:), so it shows in a mail client that won't fetch remote
+  # images; never a link to the public website, which doesn't serve it.
+  it "carries the branding logo inline" do
+    logo!
     Setting.set("general", {"site_base_url" => "https://www.acme.test"})
 
-    expect(html).to match(%r{<img src="http://example\.com/rails/active_storage/blobs/redirect/[^"]+/logo\.png"})
-    expect(html).not_to include("acme.test/rails")
+    mail = sent
+    expect(html(mail)).to include(%(<img src="cid:logo@cms"))
+    expect(mail.attachments.sole).to be_inline
+    expect(html(mail)).not_to include("acme.test/rails")
   end
 
   it "leaves the logo out when Branding has none" do
     expect(html).not_to include("<img")
+  end
+
+  describe "in the site's design" do
+    let(:template) { %(<table><tr><td data-cms-logo><img alt="Acme"></td></tr><tr data-cms-repeat="answers"><td>{{answer.label}}</td></tr></table>) }
+
+    before do
+      email = form.notification_email
+      email.receive_site_template!(html: template, digest: email.content_digest)
+    end
+
+    it "puts the logo where the template marks it" do
+      logo!
+      mail = sent
+
+      expect(html(mail)).to include(%(<img alt="Acme" src="cid:logo@cms">))
+      expect(html(mail)).not_to include("data-cms-logo")
+      expect(mail.attachments.sole).to be_inline
+    end
+
+    it "takes the place out, and attaches nothing, without a logo" do
+      mail = sent
+
+      expect(html(mail)).not_to include("<img", "data-cms-logo")
+      expect(mail.attachments).to be_empty
+    end
   end
 end
