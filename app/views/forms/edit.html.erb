@@ -1,4 +1,4 @@
-<% @page_title = "Edit Form" %>
+<% @page_title = @form.title.presence || "Form" %>
 <%= parent_page "Forms", forms_path %>
 <% trash = Current.user.can?("forms:delete") %>
 
@@ -6,7 +6,7 @@
   <%= link_to "Add New", new_form_path, class: "btn" %>
   <%= link_to "View submissions", form_path(@form.slug), class: "btn" %>
 <% end %>
-<%= render "layouts/shared/page_header", title: @page_title %>
+<%= render "layouts/shared/editor_bar" %>
 <%= render "layouts/shared/errors", record: @form %>
 
 <%# The form builder, after Payload's: the title, the form's fields as rows

@@ -7,8 +7,7 @@
 <% content_for :page_actions do %>
   <%= link_to (sibling == "confirmation" ? "Confirmation email" : "Notification email"), edit_form_email_path(form_slug: @form.slug, kind: sibling), class: "btn" %>
 <% end %>
-<%= render "layouts/shared/page_header", title: title,
-      description: (@email.notification? ? "Sent to your people on each new submission to “#{@form.title}”." : "An automatic reply to whoever submitted “#{@form.title}”, at the address they gave.") %>
+<%= render "layouts/shared/editor_bar", label: title %>
 <%= render "layouts/shared/errors", record: @email %>
 
 <%# The email as content: its subject and blocks in the main column (the
