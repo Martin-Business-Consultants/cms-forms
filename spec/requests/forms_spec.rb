@@ -25,6 +25,14 @@ RSpec.describe "The Forms plugin", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Contact", "contact", "Import JSON", "New form", "Duplicate", form_activation_path(form.slug))
+      expect(response.body.scan(">Import JSON<").size).to eq(1)
+    end
+
+    it "draws the page's buttons once, in the list's toolbar, with no forms too" do
+      get forms_path
+
+      expect(response.body).to include("list-toolbar")
+      expect(response.body.scan(">Import JSON<").size).to eq(1)
     end
 
     it "switches a form active and inactive from the list" do

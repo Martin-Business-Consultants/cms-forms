@@ -9,6 +9,10 @@
   white-space: nowrap;
 }
 
+/* A block, so the cell centers the switch rather than a line of text whose
+   baseline it sat on (it rode a few pixels high). */
+.forms-active-column .switch { display: flex; }
+
 /* A list that fills its card edge to edge (a form's fields, a submission's
    files): each row a name and the small print after it, a rule between
    rows. */

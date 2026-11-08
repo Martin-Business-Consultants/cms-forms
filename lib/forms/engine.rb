@@ -91,7 +91,7 @@ module Forms
     end
 
     config.to_prepare do
-      Cms::Plugins.register :forms, name: "Forms", version: "1.8.0", author: "Martin Business Consultants",
+      Cms::Plugins.register :forms, name: "Forms", version: "1.8.1", author: "Martin Business Consultants",
         enabled_by_default: true, requires: ">= 1.34",
         description: "Contact, booking and signup forms for the site: their fields and emails, the endpoint " \
                      "the site posts to, spam protection, and the Submissions inbox.",

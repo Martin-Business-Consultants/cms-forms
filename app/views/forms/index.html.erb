@@ -19,10 +19,15 @@
     <%= render "forms/new_form", form_record: @new_form || Form.new(status: "draft", submit_label: "Submit"), open: @new_form.present? %>
   <% end %>
 <% end %>
-<%= render "layouts/shared/page_header", title: @page_title, description: "The forms the site renders. Submissions post to /api/forms/<slug>/submissions and land in the Submissions inbox." %>
+<%# The page's buttons go in the list's toolbar, beside its search, as the
+    core's lists have them; the header leaves them out. %>
+<%= render "layouts/shared/page_header", title: @page_title, actions: false,
+      description: "The forms the site renders. Submissions post to /api/forms/<slug>/submissions and land in the Submissions inbox." %>
 
 <% if can_delete && @forms.any? %>
   <%= render "layouts/shared/bulk_actions", id: "forms_bulk", noun: "form", deletion_path: forms_bulk_deletions_path %>
+<% else %>
+  <%= render "layouts/shared/list_toolbar" %>
 <% end %>
 
 <div class="table-wrap" data-controller="select-all">
