@@ -4,11 +4,11 @@
 <% filtered = Array(webhook.event_filters.is_a?(Hash) ? webhook.event_filters.dig("submission.created", "form_slugs") : nil) %>
 <% if forms.any? %>
   <fieldset class="stack stack--sm">
-    <legend class="label">Which forms send submission.created</legend>
-    <p class="help">Tick none for every form.</p>
+    <legend>Which forms send submission.created</legend>
+    <p class="field__hint">Tick none for every form.</p>
     <% forms.each do |f| %>
       <%# herb:key f.slug %>
-      <label class="choice">
+      <label class="checkbox">
         <%= check_box_tag "webhook[event_filters][submission.created][form_slugs][]", f.slug, filtered.include?(f.slug), id: "webhook_form_" + f.slug %>
         <%= f.title %>
       </label>

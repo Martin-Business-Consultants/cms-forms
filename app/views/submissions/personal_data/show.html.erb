@@ -3,28 +3,28 @@
 <%= render "layouts/shared/page_header", title: @page_title,
       description: "When someone asks what the site holds about them, or to have it deleted: their email address finds every submission that holds it." %>
 
-<section class="panel panel--padded fields measure--lg">
-  <%= form_with url: submissions_personal_data_path, method: :get, class: "cluster" do |form| %>
-    <%= form.email_field :email, value: @email, required: true, placeholder: "their@email.com", class: "grow", aria: { label: "Their email address" } %>
+<section class="card measure">
+  <%= form_with url: submissions_personal_data_path, method: :get, class: "forms-find" do |form| %>
+    <%= form.email_field :email, value: @email, required: true, placeholder: "their@email.com", aria: { label: "Their email address" } %>
     <button type="submit" class="btn btn--primary">Find</button>
   <% end %>
 
   <% if @email.present? then %>
     <% if @submissions.empty? then %>
-      <p class="text-body">No submission holds <strong class="text-semibold"><%= @email %></strong>.</p>
+      <p>No submission holds <strong><%= @email %></strong>.</p>
     <% else %>
-      <p class="text-body"><%= pluralize(@submissions.size, "submission") %> hold <strong class="text-semibold"><%= @email %></strong>:</p>
-      <ul class="boxed-list">
+      <p><%= pluralize(@submissions.size, "submission") %> hold <strong><%= @email %></strong>:</p>
+      <ul class="forms-boxed-list">
         <% @submissions.each do |submission| %>
           <%# herb:key submission.id %>
-          <li class="cluster cluster--between">
-            <span class="text-medium text-ink"><%= submission.form&.title || "A deleted form" %></span>
-            <span class="text-muted"><%= site_time_tag submission.created_at %><% if submission.files.attached? then %> · <%= pluralize(submission.files.size, "file") %><% end %></span>
+          <li>
+            <span class="strong"><%= submission.form&.title || "A deleted form" %></span>
+            <span class="muted"><%= site_time_tag submission.created_at %><% if submission.files.attached? then %> · <%= pluralize(submission.files.size, "file") %><% end %></span>
           </li>
         <% end %>
       </ul>
-      <div class="cluster">
-        <%= link_to "Download them (JSON)", export_submissions_personal_data_path(email: @email), class: "btn", data: { turbo: false } %>
+      <div class="button-row">
+        <%= link_to "Download them (JSON)", export_submissions_personal_data_path(email: @email), class: "btn btn--secondary", data: { turbo: false } %>
         <% if Current.user.can?("submissions:delete") then %>
           <%= button_to "Delete them all", submissions_personal_data_path, method: :delete, params: { email: @email },
                 class: "btn btn--danger", form: { data: { turbo_confirm: "Delete #{pluralize(@submissions.size, "submission")} and their files? This can't be undone." } } %>
@@ -32,5 +32,5 @@
       </div>
     <% end %>
   <% end %>
-  <p class="help">The audit log records what was done and how many, not the address.</p>
+  <p class="field__hint">The audit log records what was done and how many, not the address.</p>
 </section>

@@ -4,44 +4,45 @@
     only the keys mapped here (FormWebhookBody). Its inputs belong to the
     form editor, so they save with it. %>
 <% body = FormWebhookBody.new(record) %>
-<div data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
-  <div class="row row--between row--base">
-    <span class="stack stack--2xs grow">
-      <span class="label">Webhook</span>
+<div data-controller="rune-dialog" data-action="keydown.esc->rune-dialog#close:stop">
+  <div class="row row--between">
+    <span class="stack stack--xs grow">
+      <span class="field__label">Webhook</span>
       <% if record.notify_webhook_url.present? %>
-        <code class="truncate text-mono text-small text-body"><%= record.notify_webhook_url %></code>
-        <span class="help"><%= body.mapped? ? pluralize(body.mappings.size, "mapped key") : "Sends every field" %></span>
+        <code class="truncate"><%= record.notify_webhook_url %></code>
+        <span class="field__hint"><%= body.mapped? ? pluralize(body.mappings.size, "mapped key") : "Sends every field" %></span>
       <% else %>
-        <span class="help">Not set up. Each submission can also be posted to a URL.</span>
+        <span class="field__hint">Not set up. Each submission can also be posted to a URL.</span>
       <% end %>
     </span>
-    <button type="button" class="btn btn--sm no-shrink" data-action="dialog#open"><%= record.notify_webhook_url.present? ? "Edit" : "Set up" %></button>
+    <button type="button" class="btn btn--secondary btn--sm" data-action="rune-dialog#open"><%= record.notify_webhook_url.present? ? "Edit" : "Set up" %></button>
   </div>
 
-  <dialog class="dialog dialog--sheet dialog--sheet-half forms-webhook-sheet" data-dialog-target="dialog" aria-label="Webhook" closedby="any">
+  <dialog class="dialog sheet forms-webhook-sheet" data-rune-dialog-target="dialog" data-action="click->rune-dialog#backdrop" aria-label="Webhook" closedby="any">
+    <div class="dialog__box">
     <header class="dialog__header">
-      <h2 class="heading heading--lg">Webhook</h2>
-      <button type="button" class="btn btn--plain btn--sm" data-action="dialog#close">Close</button>
+      <h2 class="dialog__title">Webhook</h2>
+      <%= icon_button "close", label: "Close", data: { action: "rune-dialog#close" } %>
     </header>
 
     <%= settings_field "Request URL", hint: "Each submission is posted here as JSON." do %>
-      <%= form.url_field :notify_webhook_url, class: "text-mono", placeholder: "https://hooks.example.com/forms" %>
+      <%= form.url_field :notify_webhook_url, class: "mono", placeholder: "https://hooks.example.com/forms" %>
     <% end %>
 
     <fieldset class="stack stack--sm">
-      <legend class="label">Request body</legend>
+      <legend>Request body</legend>
       <label class="template-choice">
         <%= radio_button_tag "form[webhook_body][mode]", "all", !body.mapped?, id: nil %>
-        <span class="stack stack--2xs">
-          <strong class="text-medium text-ink">All fields</strong>
-          <span class="help">The whole submission: the form, every answer, files, IP and time.</span>
+        <span class="stack stack--xs">
+          <strong>All fields</strong>
+          <span class="field__hint">The whole submission: the form, every answer, files, IP and time.</span>
         </span>
       </label>
       <label class="template-choice">
         <%= radio_button_tag "form[webhook_body][mode]", "fields", body.mapped?, id: nil %>
-        <span class="stack stack--2xs">
-          <strong class="text-medium text-ink">Select fields</strong>
-          <span class="help">Only the keys below, each set to a form value or a custom one.</span>
+        <span class="stack stack--xs">
+          <strong>Select fields</strong>
+          <span class="field__hint">Only the keys below, each set to a form value or a custom one.</span>
         </span>
       </label>
     </fieldset>
@@ -50,7 +51,7 @@
       <div class="forms-webhook-map__head" aria-hidden="true">
         <span class="forms-webhook-map__cells">
           <span>Key</span>
-          <span class="span-2">Value</span>
+          <span class="forms-webhook-map__wide">Value</span>
         </span>
       </div>
       <ol class="stack stack--sm" data-sortable-list-target="list">
@@ -60,14 +61,14 @@
         <% end %>
       </ol>
       <div>
-        <button type="button" class="btn btn--sm" data-action="sortable-list#add">
+        <button type="button" class="btn btn--secondary btn--sm" data-action="sortable-list#add">
           <%= icon_tag "add" %>
           <span>Add key</span>
         </button>
       </div>
-      <p class="help">
-        A custom value can take <code class="code">{{form_title}}</code>, <code class="code">{{submission_id}}</code>, <code class="code">{{submitted_at}}</code>,
-        <code class="code">{{ip}}</code> or a field’s name, as <code class="code">{{email}}</code>. The fields offered are the form’s as last saved.
+      <p class="field__hint">
+        A custom value can take <code>{{form_title}}</code>, <code>{{submission_id}}</code>, <code>{{submitted_at}}</code>,
+        <code>{{ip}}</code> or a field’s name, as <code>{{email}}</code>. The fields offered are the form’s as last saved.
       </p>
       <template data-sortable-list-target="template">
         <%= render "forms/webhook_mapping", mapping: {}, key: "__ROW__", record: record %>
@@ -75,8 +76,9 @@
     </section>
 
     <div class="dialog__actions">
-      <button type="button" class="btn" data-action="dialog#close">Close</button>
+      <button type="button" class="btn btn--ghost" data-action="rune-dialog#close">Close</button>
       <%= form.button "Save", class: "btn btn--primary" %>
+    </div>
     </div>
   </dialog>
 </div>

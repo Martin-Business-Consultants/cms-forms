@@ -77,14 +77,14 @@ RSpec.describe "The Forms plugin", type: :request do
       get new_form_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Contact", "dialog--sheet", 'data-dialog-auto-open-value="true"')
+      expect(response.body).to include("Contact", "dialog sheet", 'data-rune-dialog-auto-open-value="true"')
     end
 
     it "reopens the New form sheet with its errors" do
       post forms_path, params: {form: {title: "", slug: "Bad Slug"}}
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to include("That didn’t work", "dialog--sheet", 'data-dialog-auto-open-value="true"')
+      expect(response.body).to include("That didn’t work", "dialog sheet", 'data-rune-dialog-auto-open-value="true"')
     end
 
     it "won't take a slug the admin's own routes use" do
@@ -143,7 +143,7 @@ RSpec.describe "The Forms plugin", type: :request do
       ])
 
       get edit_form_path(form.slug)
-      expect(response.body).to include("dialog--sheet-half", "2 mapped keys", 'value="field:email" selected="selected"')
+      expect(response.body).to include("forms-webhook-sheet", "2 mapped keys", 'value="field:email" selected="selected"')
     end
 
     it "re-renders the edit page when the fields don't validate" do

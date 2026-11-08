@@ -4,7 +4,7 @@
     forms--recipients; there's always a row to fill in. %>
 <% entries = email.recipient_entries.presence || [FormEmail::Recipient.new(name: "", email: "")] %>
 <fieldset class="stack stack--sm" data-controller="forms--recipients">
-  <legend class="label">Recipients</legend>
+  <legend>Recipients</legend>
   <div class="stack stack--sm" data-forms--recipients-target="list">
     <% entries.each_with_index do |entry, index| %>
       <%# herb:key index %>
@@ -13,9 +13,7 @@
           <input type="text" name="form_email[recipient_entries][][name]" value="<%= entry.name %>" placeholder="Name" aria-label="Name" autocomplete="off">
           <input type="email" name="form_email[recipient_entries][][email]" value="<%= entry.email %>" placeholder="Email" aria-label="Email" autocomplete="off">
         </div>
-        <button type="button" class="btn btn--plain btn--icon" title="Remove" data-action="forms--recipients#remove">
-          <%= icon_tag "close" %><span class="visually-hidden">Remove</span>
-        </button>
+        <%= icon_button "close", label: "Remove", data: { action: "forms--recipients#remove" } %>
       </div>
     <% end %>
   </div>
@@ -25,13 +23,11 @@
         <input type="text" name="form_email[recipient_entries][][name]" placeholder="Name" aria-label="Name" autocomplete="off">
         <input type="email" name="form_email[recipient_entries][][email]" placeholder="Email" aria-label="Email" autocomplete="off">
       </div>
-      <button type="button" class="btn btn--plain btn--icon" title="Remove" data-action="forms--recipients#remove">
-        <%= icon_tag "close" %><span class="visually-hidden">Remove</span>
-      </button>
+      <%= icon_button "close", label: "Remove", data: { action: "forms--recipients#remove" } %>
     </div>
   </template>
   <div>
-    <button type="button" class="btn btn--sm" data-action="forms--recipients#add">
+    <button type="button" class="btn btn--secondary btn--sm" data-action="forms--recipients#add">
       <%= icon_tag "add" %><span>Add recipient</span>
     </button>
   </div>

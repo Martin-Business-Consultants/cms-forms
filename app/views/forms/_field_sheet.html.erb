@@ -1,37 +1,39 @@
 <%# locals: (form:) %>
 <%# The picked field's settings, in a sheet as Payload edits a block in a
     drawer: one block per field (forms/_field_settings), all posted, the
-    picked one shown, split as Gravity Forms splits them: General, Appearance,
-    Advanced. The builder opens it (its dialog outlet) when a field is picked;
-    closing it unpicks the field. %>
+    picked one shown, split as Gravity Forms splits them: General,
+    Appearance, Advanced. The builder opens it (its dialog outlet) when a
+    field is picked; closing it unpicks the field. %>
 <% fields = Array(form.fields).map { it.is_a?(Hash) ? it : {} } %>
-<div id="form_field_sheet" class="contents" data-controller="dialog" data-dialog-modal-value="true" data-action="keydown.esc->dialog#close:stop">
-  <dialog class="dialog dialog--sheet form-panel" data-dialog-target="dialog" data-forms--builder-target="panel" data-tab="general"
-          aria-label="Field settings" closedby="any" data-action="close->forms--builder#unpick">
-    <header class="dialog__header">
-      <div class="grow">
-        <h2 class="heading heading--lg">Field settings</h2>
-        <p class="truncate text-muted" data-forms--builder-target="sheetTitle"></p>
+<div id="form_field_sheet" class="contents" data-controller="rune-dialog" data-action="keydown.esc->rune-dialog#close:stop">
+  <dialog class="dialog sheet form-panel" data-rune-dialog-target="dialog" data-forms--builder-target="panel" data-tab="general"
+          aria-label="Field settings" closedby="any" data-action="click->rune-dialog#backdrop close->forms--builder#unpick">
+    <div class="dialog__box">
+      <header class="dialog__header">
+        <div class="grow">
+          <h2 class="dialog__title">Field settings</h2>
+          <p class="truncate muted" data-forms--builder-target="sheetTitle"></p>
+        </div>
+        <%= icon_button "close", label: "Close", data: { action: "rune-dialog#close" } %>
+      </header>
+
+      <div class="tabs" role="tablist">
+        <% [ [ "general", "General" ], [ "appearance", "Appearance" ], [ "advanced", "Advanced" ] ].each do |tab, label| %>
+          <%# herb:key tab %>
+          <button type="button" class="tabs__tab form-panel__subtab" role="tab" data-tab="<%= tab %>" data-action="forms--builder#showTab"><%= label %></button>
+        <% end %>
       </div>
-      <button type="button" class="btn btn--plain btn--sm" data-action="dialog#close">Close</button>
-    </header>
 
-    <div class="form-panel__tabs" role="tablist">
-      <% [ [ "general", "General" ], [ "appearance", "Appearance" ], [ "advanced", "Advanced" ] ].each do |tab, label| %>
-        <%# herb:key tab %>
-        <button type="button" class="form-panel__subtab" role="tab" data-tab="<%= tab %>" data-action="forms--builder#showTab"><%= label %></button>
-      <% end %>
-    </div>
+      <div data-forms--builder-target="settingsList">
+        <% fields.each_with_index do |field, index| %>
+          <%# herb:key index %>
+          <%= render "forms/field_settings", field: field, key: "f" + index.to_s %>
+        <% end %>
+      </div>
 
-    <div data-forms--builder-target="settingsList">
-      <% fields.each_with_index do |field, index| %>
-        <%# herb:key index %>
-        <%= render "forms/field_settings", field: field, key: "f" + index.to_s %>
-      <% end %>
-    </div>
-
-    <div class="dialog__actions">
-      <button type="button" class="btn btn--primary" data-action="dialog#close">Done</button>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--primary" data-action="rune-dialog#close">Done</button>
+      </div>
     </div>
 
     <template data-forms--builder-target="settingsTemplate">

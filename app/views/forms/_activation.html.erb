@@ -6,11 +6,11 @@
   <%= form_with url: form_activation_path(form.slug), method: :patch, class: "contents", data: { controller: "form" } do %>
     <label class="switch" title="<%= active ? "Active: takes submissions" : "Inactive" %>">
       <%= hidden_field_tag :active, "0", id: nil %>
-      <%= check_box_tag :active, "1", active, id: nil, class: "switch__input", "aria-label": "Active: " + form.title,
+      <%= check_box_tag :active, "1", active, id: nil, role: "switch", "aria-label": "Active: " + form.title,
             data: { action: "change->form#submit" } %>
-      <span class="switch__btn"></span>
+      <span class="switch__track" aria-hidden="true"></span>
     </label>
   <% end %>
 <% else %>
-  <span class="text-body"><%= active ? "Active" : "Inactive" %></span>
+  <span><%= active ? "Active" : "Inactive" %></span>
 <% end %>

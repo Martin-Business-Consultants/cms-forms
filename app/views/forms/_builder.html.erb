@@ -6,8 +6,8 @@
     settings in a sheet (forms/_field_sheet). Rows post as
     form[fields][<row id>][…] for FormFields to read back, in their order. %>
 <% fields = Array(form.fields).map { it.is_a?(Hash) ? it : {} } %>
-<section class="panel">
-  <h2 class="heading editor__section-title">Fields</h2>
+<section class="card card--flush">
+  <h2 class="card__title editor__section-title">Fields</h2>
   <div class="forms-builder__canvas" data-forms--builder-target="dropzone">
     <ol class="stack stack--sm" data-forms--builder-target="canvas">
       <% fields.each_index do |index| %>
@@ -24,18 +24,18 @@
   </div>
 
   <div class="forms-builder__palette">
-    <div class="cluster cluster--between">
-      <h3 class="text-medium">Add a field</h3>
-      <span class="help">Click one to add it at the end, or drag it into place.</span>
+    <div class="forms-builder__palette-head">
+      <h3>Add a field</h3>
+      <span class="field__hint">Click one to add it at the end, or drag it into place.</span>
     </div>
     <% form_field_palette.each do |group, types| %>
       <%# herb:key group %>
       <div class="forms-builder__group">
         <span class="forms-builder__group-name"><%= group %></span>
-        <div class="cluster cluster--xs">
+        <div class="button-row">
           <% types.each do |type, label, icon| %>
             <%# herb:key type %>
-            <button type="button" class="btn btn--sm forms-builder__type" draggable="true" data-type="<%= type %>" data-label="<%= label %>"
+            <button type="button" class="btn btn--secondary btn--sm forms-builder__type" draggable="true" data-type="<%= type %>" data-label="<%= label %>"
                     data-action="forms--builder#add dragstart->forms--builder#paletteDragStart dragend->forms--builder#dragEnd">
               <%= icon_tag icon %>
               <span><%= label %></span>
@@ -44,7 +44,7 @@
         </div>
       </div>
     <% end %>
-    <p class="help">A spam trap (<code class="code"><%= Form::HONEYPOT_FIELD %></code>) is added by the site’s renderer, not here.</p>
+    <p class="field__hint">A spam trap (<code><%= Form::HONEYPOT_FIELD %></code>) is added by the site’s renderer, not here.</p>
   </div>
 
   <template data-forms--builder-target="cardTemplate">

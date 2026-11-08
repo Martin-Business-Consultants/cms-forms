@@ -1,446 +1,420 @@
-/* The Forms plugin's screens: what the admin's own classes (STYLE.md,
-   Styling) can't say, drawn with its tokens so they follow Settings ›
-   Branding and the dark theme. */
-@layer components {
-  /* The forms list's Active column (forms/index): as narrow as its switch. */
-  .forms-active-column {
-    inline-size: 1px;
-    white-space: nowrap;
-  }
-
-  /* A list that fills its panel edge to edge (a form's fields, a
-     submission's files): each row a name and the small print after it, a
-     hairline between rows. */
-  .forms-list {
-    > li {
-      align-items: baseline;
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-1) var(--space-3);
-      padding: var(--space-2-5) var(--space-5);
-    }
-
-    > li + li {
-      border-block-start: 1px solid var(--gray-100);
-    }
-  }
-
-  /* A submission's answers (form_submissions/show): the field's label over
-     its answer, side by side from 40rem, the answer as typed (its line
-     breaks kept). --meta for the request's details, smaller and in mono. */
-  .forms-answers {
-    > div {
-      display: grid;
-      gap: var(--space-1) var(--space-4);
-      padding: var(--space-3) var(--space-5);
-
-      @media (width >= 40rem) {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    > div + div {
-      border-block-start: 1px solid var(--gray-100);
-    }
-
-    dt {
-      color: var(--gray-900);
-      font-weight: var(--weight-medium);
-    }
-
-    dd {
-      color: var(--gray-700);
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-
-      @media (width >= 40rem) {
-        grid-column: span 2 / span 2;
-      }
-    }
-  }
-
-  .forms-answers--meta {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    line-height: var(--leading-xs);
-
-    > div {
-      padding-block: var(--space-2-5);
-    }
-
-    dd {
-      color: var(--gray-600);
-      white-space: normal;
-    }
-  }
-
-  /* A submission's preview in the inbox (submissions/index): quiet until
-     hovered, then ink and underlined. */
-  .forms-submission-link {
-    color: var(--gray-500);
-
-    &:hover {
-      color: var(--gray-900);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-  }
-
-  /* The form builder (forms/_builder): the rows over the submit button,
-     then the palette, a gray strip at the panel's foot. */
-  .forms-builder__canvas {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-3);
-
-    @media (width >= 40rem) {
-      padding: var(--space-5);
-    }
-  }
-
-  .forms-builder__empty {
-    border: 1px dashed var(--gray-300);
-    border-radius: var(--radius-lg);
-    color: var(--gray-500);
-    padding: var(--space-10) var(--space-4);
-    text-align: center;
-  }
-
-  /* The form's submit button, as the site shows it: for looking at. */
-  .forms-builder__submit {
-    border-block-start: 1px dashed var(--gray-200);
-    padding-block-start: var(--space-4);
-
-    > .btn {
-      pointer-events: none;
-    }
-  }
-
-  .forms-builder__palette {
-    background-color: var(--gray-50);
-    border-block-start: 1px solid var(--gray-200);
-    border-end-end-radius: var(--radius-xl);
-    border-end-start-radius: var(--radius-xl);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-  }
-
-  /* A group of field types: its name over its buttons, beside them from
-     40rem. */
-  .forms-builder__group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-
-    @media (width >= 40rem) {
-      align-items: center;
-      flex-direction: row;
-    }
-  }
-
-  .forms-builder__group-name {
-    color: var(--gray-500);
-    flex-shrink: 0;
-    font-size: var(--text-xs);
-    line-height: var(--leading-xs);
-
-    @media (width >= 40rem) {
-      inline-size: 7rem;
-    }
-  }
-
-  .forms-builder__type {
-    cursor: grab;
-
-    .icon {
-      color: var(--gray-500);
-    }
-  }
-
-  /* A field in the builder (forms/_field_card): a bordered row, outlined in
-     the accent while it's picked (its settings open in the sheet), faded
-     while it's dragged; the builder's drop placeholder (builder_controller
-     makes it) dashed in the accent. */
-  .form-card {
-    background-color: var(--surface);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-
-    &:hover {
-      border-color: var(--gray-300);
-    }
-  }
-
-  .form-card--picked,
-  .form-card--picked:hover {
-    border-color: var(--accent-600);
-    box-shadow: 0 0 0 1px var(--accent-600);
-  }
-
-  .form-card--dragging {
-    opacity: 0.4;
-  }
-
-  .form-card--placeholder,
-  .form-card--placeholder:hover {
-    block-size: 3.5rem;
-    border: 2px dashed var(--accent-600);
-    cursor: default;
-  }
-
-  /* Its header: the drag handle, the field's type and name, its tools. */
-  .form-card__header {
-    align-items: center;
-    border-block-end: 1px solid var(--gray-100);
-    display: flex;
-    gap: var(--space-2);
-    padding: var(--space-1-5) var(--space-1-5) var(--space-1-5) var(--space-2);
-  }
-
-  /* Under it, the field as the site shows it (builder_controller draws it
-     with the form-preview classes), for looking at. */
-  .form-card__preview {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1-5);
-    padding: var(--space-3) var(--space-4);
-    pointer-events: none;
-  }
-
-  .form-preview__label {
-    color: var(--gray-900);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-sm);
-  }
-
-  .form-preview__required {
-    color: var(--red-600);
-  }
-
-  .form-preview__help {
-    color: var(--gray-500);
-    font-size: var(--text-xs);
-    line-height: var(--leading-xs);
-  }
-
-  .form-preview__choices {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1-5);
-  }
-
-  .form-preview__choice {
-    align-items: center;
-    color: var(--gray-700);
-    display: flex;
-    font-size: var(--text-sm);
-    gap: var(--space-2);
-    line-height: var(--leading-sm);
-  }
-
-  .form-preview__file {
-    border: 1px dashed var(--gray-300);
-    border-radius: var(--radius-md);
-    color: var(--gray-500);
-    font-size: var(--text-sm);
-    line-height: var(--leading-sm);
-    padding: var(--space-3-5);
-    text-align: center;
-  }
-
-  /* Disabled for looking at, but not dimmed as base.css dims a disabled
-     control. */
-  .form-preview__control {
-    inline-size: 100%;
-    opacity: 1;
-  }
-
-  .form-preview__check {
-    opacity: 1;
-  }
-
-  /* The field sheet (forms/_field_sheet): its General / Appearance /
-     Advanced tabs on a rule, the current one (the sheet's data-tab)
-     underlined in the accent, and only its settings shown. */
-  .form-panel__tabs {
-    border-block-end: 1px solid var(--gray-200);
-    display: flex;
-    gap: var(--space-4);
-  }
-
-  .form-panel__subtab {
-    border-block-end: 2px solid transparent;
-    color: var(--gray-500);
-    font-size: var(--text-sm);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-sm);
-    margin-block-end: -1px;
-    padding-block: var(--space-2);
-
-    &:hover {
-      color: var(--gray-900);
-    }
-  }
-
-  .form-panel[data-tab="general"] .form-panel__subtab[data-tab="general"],
-  .form-panel[data-tab="appearance"] .form-panel__subtab[data-tab="appearance"],
-  .form-panel[data-tab="advanced"] .form-panel__subtab[data-tab="advanced"] {
-    border-color: var(--accent-600);
-    color: var(--gray-900);
-  }
-
-  .form-settings__tab {
-    display: none;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-
-  .form-panel[data-tab="general"] .form-settings__tab[data-tab="general"],
-  .form-panel[data-tab="appearance"] .form-settings__tab[data-tab="appearance"],
-  .form-panel[data-tab="advanced"] .form-settings__tab[data-tab="advanced"] {
-    display: flex;
-  }
-
-  /* A setting only some types have shows for those types (the type select
-     lives under Advanced). */
-  .form-settings [data-for] {
-    display: none;
-    flex-direction: column;
-    gap: var(--space-5);
-  }
-
-  .form-settings:has([data-role="type"] :is(option[value="select"], option[value="radio"]):checked) [data-for="choices"],
-  .form-settings:has([data-role="type"] option[value="file"]:checked) [data-for="file"],
-  .form-settings:has([data-role="type"] :is(option[value="text"], option[value="email"], option[value="tel"], option[value="url"], option[value="textarea"]):checked) [data-for="text"],
-  .form-settings:not(:has([data-role="type"] :is(option[value="text"], option[value="email"], option[value="tel"], option[value="url"], option[value="textarea"]):checked)) [data-for="no-text"] {
-    display: flex;
-  }
-
-  /* A form's two emails in its editor (forms/edit): a bordered card each,
-     its name and whether it's on, the subject, who it goes to. */
-  .forms-email-card {
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    min-inline-size: 0;
-    padding: var(--space-3) var(--space-4);
-
-    &:hover {
-      background-color: var(--gray-50);
-      border-color: var(--gray-300);
-    }
-  }
-
-  /* A {{token}} an email's text can take (form_emails/edit). */
-  .forms-token {
-    color: var(--gray-900);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    line-height: var(--leading-xs);
-    white-space: nowrap;
-  }
-
-  /* The Send box's Save, on a gray strip across the box's foot. */
-  .forms-send__save {
-    background-color: var(--gray-50);
-    border-block-start: 1px solid var(--gray-200);
-    border-end-end-radius: var(--radius-xl);
-    border-end-start-radius: var(--radius-xl);
-    display: flex;
-    justify-content: flex-end;
-    margin: 0 calc(var(--space-5) * -1) calc(var(--space-5) * -1);
-    padding: var(--space-3) var(--space-5);
-  }
-
-  /* A notification recipient (form_emails/_recipients): a name and an
-     address in a bordered row, its Remove beside them. */
-  .forms-recipient {
-    align-items: flex-start;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    display: flex;
-    gap: var(--space-1-5);
-    padding: var(--space-3);
-  }
-
-  .forms-recipient__inputs {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: var(--space-1-5);
-    min-inline-size: 0;
-
-    > input {
-      inline-size: 100%;
-    }
-  }
-
-  /* The email preview's frame, filling the rest of its sheet. */
-  .forms-email-preview {
-    background-color: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    flex: 1;
-    inline-size: 100%;
-    min-block-size: 0;
-  }
-
-  /* The webhook sheet (forms/_webhook_sheet): the key mapping only while
-     the body is "Select fields"; its column heads from 40rem; a row's key,
-     value and custom value in a column on a phone, in three from 40rem,
-     and the custom value box only for a key set to one (kept in its column,
-     or dropped on a phone). */
-  .forms-webhook-map {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .forms-webhook-sheet:has(input[value="all"]:checked) .forms-webhook-map {
-    display: none;
-  }
-
-  .forms-webhook-map__head {
-    color: var(--gray-500);
-    display: none;
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-xs);
-    padding-inline-end: calc(var(--space-8) + var(--space-2));
-
-    @media (width >= 40rem) {
-      display: flex;
-    }
-  }
-
-  .forms-webhook-map__cells {
-    display: grid;
-    flex: 1;
-    gap: var(--space-2);
-    grid-template-columns: minmax(0, 1fr);
-    min-inline-size: 0;
-
-    @media (width >= 40rem) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    > :is(input, select) {
-      inline-size: 100%;
-    }
-  }
-
-  .forms-webhook-map__row:not(:has(option[value="custom"]:checked)) .forms-webhook-map__custom {
-    visibility: hidden;
-
-    @media (width < 40rem) {
-      display: none;
-    }
-  }
+/* The Forms plugin's screens: what rune_ui's classes and the admin's own
+   (STYLE.md, Styling) can't say, drawn with rune's tokens so they follow
+   Settings › Branding and the dark theme. Unlayered, as the admin's own
+   stylesheets are. */
+
+/* The forms list's Active column (forms/index): as narrow as its switch. */
+.forms-active-column {
+  width: 1px;
+  white-space: nowrap;
+}
+
+/* A list that fills its card edge to edge (a form's fields, a submission's
+   files): each row a name and the small print after it, a rule between
+   rows. */
+.forms-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-3) var(--s-4);
+}
+
+.forms-list > li + li { border-top: 1px solid var(--line); }
+
+/* "The latest 25. See them all." under a form's submissions. */
+.forms-footer-note {
+  justify-content: flex-start;
+  padding: var(--s-3) var(--s-4);
+  color: var(--text-muted);
+}
+
+/* A submission's answers (form_submissions/show): the field's label over
+   its answer, side by side on a wider screen, the answer as typed (its line
+   breaks kept). --meta for the request's details, smaller and in mono. */
+.forms-answers > div {
+  display: grid;
+  gap: var(--s-1) var(--s-4);
+  padding: var(--s-3) var(--s-4);
+}
+
+.forms-answers > div + div { border-top: 1px solid var(--line); }
+.forms-answers dt { font-weight: var(--weight-strong); }
+
+.forms-answers dd {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+@media (min-width: 640px) {
+  .forms-answers > div { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .forms-answers dd { grid-column: span 2; }
+}
+
+.forms-answers--meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+}
+
+.forms-answers--meta > div { padding-block: var(--s-2); }
+.forms-answers--meta dd { white-space: normal; }
+
+/* A submission's preview in the inbox (submissions/index): quiet until
+   hovered. */
+.forms-submission-link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.forms-submission-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* Personal data (submissions/personal_data): the address and Find on a
+   line, and the submissions found as a ruled box. */
+.forms-find {
+  flex-direction: row;
+  gap: var(--s-2);
+}
+
+.forms-boxed-list {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.forms-boxed-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-2) var(--s-3);
+}
+
+.forms-boxed-list > li + li { border-top: 1px solid var(--line); }
+
+/* The form builder (forms/_builder): the rows over the submit button, then
+   the palette, a tinted strip at the card's foot. */
+.forms-builder__canvas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-4);
+}
+
+.forms-builder__canvas > ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forms-builder__empty {
+  padding: var(--s-6) var(--s-4);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* The form's submit button, as the site shows it: for looking at. */
+.forms-builder__submit {
+  padding-top: var(--s-4);
+  border-top: 1px dashed var(--line);
+}
+
+.forms-builder__submit > .btn { pointer-events: none; }
+
+.forms-builder__palette {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-top: 1px solid var(--line);
+  background: var(--layer-1);
+}
+
+.forms-builder__palette-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-3);
+}
+
+/* A group of field types: its name over its buttons, beside them on a
+   wider screen. */
+.forms-builder__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.forms-builder__group-name {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+}
+
+@media (min-width: 640px) {
+  .forms-builder__group { flex-direction: row; align-items: center; }
+  .forms-builder__group-name { width: 7rem; }
+}
+
+.forms-builder__type { cursor: grab; }
+.forms-builder__type .icon { color: var(--text-faint); }
+
+/* A field in the builder (forms/_field_card): a bordered row, outlined in
+   the accent while it's picked (its settings open in the sheet), faded
+   while it's dragged; the builder's drop placeholder (builder_controller
+   makes it) dashed in the accent. */
+.form-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.form-card:hover { border-color: var(--line-strong); }
+
+.form-card--picked,
+.form-card--picked:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.form-card--dragging { opacity: .4; }
+
+.form-card--placeholder,
+.form-card--placeholder:hover {
+  height: 3.5rem;
+  border: 2px dashed var(--accent);
+  cursor: default;
+}
+
+/* Its header: the drag handle, the field's type and name, its tools. */
+.form-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-1) var(--s-1) var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.form-card__title {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.form-card__title > .strong { flex-shrink: 0; }
+
+/* Under it, the field as the site shows it (builder_controller draws it
+   with the form-preview classes), for looking at. */
+.form-card__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--s-3) var(--s-4);
+  pointer-events: none;
+}
+
+.form-preview__label { font-weight: var(--weight-strong); }
+.form-preview__required { color: var(--danger); }
+
+.form-preview__help {
+  color: var(--text-faint);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+}
+
+.form-preview__choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-preview__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text-muted);
+}
+
+.form-preview__file {
+  padding: var(--s-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* Disabled for looking at, but not dimmed. */
+.form-preview__control { width: 100%; opacity: 1; }
+.form-preview__check { opacity: 1; }
+
+/* The field sheet (forms/_field_sheet): rune's tabs, the current one (the
+   sheet's data-tab) marked, and only its settings shown. */
+.form-panel[data-tab="general"] .form-panel__subtab[data-tab="general"],
+.form-panel[data-tab="appearance"] .form-panel__subtab[data-tab="appearance"],
+.form-panel[data-tab="advanced"] .form-panel__subtab[data-tab="advanced"] {
+  border-bottom-color: var(--text);
+  color: var(--text);
+  font-weight: var(--weight-strong);
+}
+
+.form-settings__tab {
+  display: none;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.form-panel[data-tab="general"] .form-settings__tab[data-tab="general"],
+.form-panel[data-tab="appearance"] .form-settings__tab[data-tab="appearance"],
+.form-panel[data-tab="advanced"] .form-settings__tab[data-tab="advanced"] {
+  display: flex;
+}
+
+/* A setting only some types have shows for those types (the type select
+   lives under Advanced). */
+.form-settings [data-for] {
+  display: none;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.form-settings:has([data-role="type"] :is(option[value="select"], option[value="radio"]):checked) [data-for="choices"],
+.form-settings:has([data-role="type"] option[value="file"]:checked) [data-for="file"],
+.form-settings:has([data-role="type"] :is(option[value="text"], option[value="email"], option[value="tel"], option[value="url"], option[value="textarea"]):checked) [data-for="text"],
+.form-settings:not(:has([data-role="type"] :is(option[value="text"], option[value="email"], option[value="tel"], option[value="url"], option[value="textarea"]):checked)) [data-for="no-text"] {
+  display: flex;
+}
+
+/* A form's two emails in its editor (forms/edit): a bordered card each,
+   its name and whether it's on, the subject, who it goes to. */
+.forms-email-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.forms-email-card:hover {
+  border-color: var(--line-strong);
+  background: var(--layer-1);
+  color: var(--text);
+}
+
+/* A {{token}} an email's text can take (form_emails/edit). */
+.forms-token {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  white-space: nowrap;
+}
+
+/* The Send box's Save, on a tinted strip across the box's foot (the
+   postbox body is padded by --s-4). */
+.forms-send__save {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 calc(var(--s-4) * -1) calc(var(--s-4) * -1);
+  padding: var(--s-3) var(--s-4);
+  border-top: 1px solid var(--line);
+  background: var(--layer-1);
+}
+
+/* A notification recipient (form_emails/_recipients): a name and an
+   address in a bordered row, its Remove beside them. */
+.forms-recipient {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.forms-recipient__inputs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* The email preview's sheet: its frame fills what's left of it. */
+.forms-preview-sheet { width: min(48rem, 100vw); }
+
+.forms-preview-sheet__box { height: 100%; }
+
+.forms-email-preview {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--layer-1);
+}
+
+/* The webhook sheet (forms/_webhook_sheet): wider than a sheet; the key
+   mapping only while the body is "Select fields"; its column heads on a
+   wider screen; a row's key, value and custom value in a column on a
+   phone, in three wider, and the custom value box only for a key set to
+   one (kept in its column, or dropped on a phone). */
+.forms-webhook-sheet { width: min(40rem, 100vw); }
+
+.forms-webhook-map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.forms-webhook-map ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forms-webhook-sheet:has(input[value="all"]:checked) .forms-webhook-map { display: none; }
+
+.forms-webhook-map__head {
+  display: none;
+  padding-right: calc(var(--control-h-sm) + var(--s-2));
+  color: var(--text-muted);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-strong);
+}
+
+.forms-webhook-map__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.forms-webhook-map__cells {
+  display: grid;
+  flex: 1;
+  gap: var(--s-2);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .forms-webhook-map__head { display: flex; }
+  .forms-webhook-map__cells { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .forms-webhook-map__wide { grid-column: span 2; }
+}
+
+.forms-webhook-map__row:not(:has(option[value="custom"]:checked)) .forms-webhook-map__custom { visibility: hidden; }
+
+@media (max-width: 639px) {
+  .forms-webhook-map__row:not(:has(option[value="custom"]:checked)) .forms-webhook-map__custom { display: none; }
 }

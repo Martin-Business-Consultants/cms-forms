@@ -8,14 +8,14 @@ const PREVIEW = {
   choices: "form-preview__choices",
   choice: "form-preview__choice",
   file: "form-preview__file",
-  // Disabled for looking at, but not dimmed as base.css dims a disabled control.
+  // Disabled for looking at, but not dimmed as a disabled control is.
   control: "form-preview__control",
   check: "form-preview__check"
 }
 
 // The form builder (forms/edit), after Payload's form builder: the fields as
 // rows previewing them, a palette that adds fields, and a sheet that edits
-// the picked one (the dialog outlet).
+// the picked one (the rune-dialog outlet).
 //
 // Each field is a card in the list and a settings block in the sheet,
 // matched by its row key. The card holds the row's first input, so rows post
@@ -25,7 +25,7 @@ const PREVIEW = {
 export default class extends Controller {
   static targets = [ "canvas", "dropzone", "card", "empty", "panel", "settings", "settingsList", "sheetTitle",
                      "cardTemplate", "settingsTemplate", "submitPreview" ]
-  static outlets = [ "dialog" ]
+  static outlets = [ "rune-dialog" ]
 
   connect() {
     this.cardTargets.forEach(card => this.#render(card.dataset.key))
@@ -223,7 +223,7 @@ export default class extends Controller {
     this.cardTargets.forEach(card => card.classList.toggle("form-card--picked", card.dataset.key === key))
     this.settingsTargets.forEach(settings => { settings.hidden = settings.dataset.key !== key })
     this.#titleSheet(key)
-    if (!this.panelTarget.open) this.dialogOutlet.open()
+    if (!this.panelTarget.open) this.runeDialogOutlet.open()
     this.#refresh()
   }
 

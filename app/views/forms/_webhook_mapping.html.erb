@@ -4,10 +4,10 @@
     value). Posted as form[webhook_body][mappings][<row id>][…]. %>
 <% name = "form[webhook_body][mappings][" + key + "]" %>
 <% fields = Array(record.fields).select { it.is_a?(Hash) && it["name"].present? } %>
-<li class="forms-webhook-map__row row" data-sortable-list-target="item">
+<li class="forms-webhook-map__row" data-sortable-list-target="item">
   <span class="forms-webhook-map__cells">
     <label class="visually-hidden" for="<%= "webhook_key_" + key %>">Key</label>
-    <%= text_field_tag name + "[key]", mapping["key"], id: "webhook_key_" + key, class: "text-mono", placeholder: "email_address",
+    <%= text_field_tag name + "[key]", mapping["key"], id: "webhook_key_" + key, class: "mono", placeholder: "email_address",
           autocomplete: "off", spellcheck: false %>
     <label class="visually-hidden" for="<%= "webhook_source_" + key %>">Value</label>
     <select name="<%= name %>[source]" id="<%= "webhook_source_" + key %>">
@@ -31,8 +31,5 @@
     <%= text_field_tag name + "[value]", mapping["value"], id: "webhook_value_" + key, class: "forms-webhook-map__custom",
           placeholder: "Website: {{form_title}}", autocomplete: "off" %>
   </span>
-  <button type="button" class="btn btn--plain btn--icon row-moves__remove no-shrink" title="Remove this key" data-action="sortable-list#remove">
-    <%= icon_tag "trash" %>
-    <span class="visually-hidden">Remove this key</span>
-  </button>
+  <%= icon_button "trash", label: "Remove this key", class: "icon-button--danger", data: { action: "sortable-list#remove" } %>
 </li>

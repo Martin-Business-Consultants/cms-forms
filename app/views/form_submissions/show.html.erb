@@ -9,11 +9,11 @@
 <% end %>
 <%= render "layouts/shared/page_header", title: @page_title %>
 <%# The header shows no description, so when and where it came from is said here. %>
-<p class="help">Received <%= time_ago_in_words(@submission.created_at) %> ago<%= " from #{@submission.ip}" if @submission.ip.present? %>.</p>
+<p class="muted">Received <%= time_ago_in_words(@submission.created_at) %> ago<%= " from #{@submission.ip}" if @submission.ip.present? %>.</p>
 
-<div class="stack stack--lg measure--lg">
-  <section class="panel">
-    <h2 class="heading editor__section-title">Answers</h2>
+<div class="stack stack--lg measure">
+  <section class="card card--flush">
+    <h2 class="card__title editor__section-title">Answers</h2>
     <dl class="forms-answers">
       <% @submission.data.to_h.each do |key, value| %>
         <%# herb:key key %>
@@ -24,19 +24,19 @@
       <% end %>
     </dl>
     <% if @submission.data.blank? %>
-      <p class="empty-state">An empty submission.</p>
+      <p class="empty empty--compact">An empty submission.</p>
     <% end %>
   </section>
 
   <% if @submission.files.attached? %>
-    <section class="panel">
-      <h2 class="heading editor__section-title">Files</h2>
+    <section class="card card--flush">
+      <h2 class="card__title editor__section-title">Files</h2>
       <ul class="forms-list">
         <% @submission.files.each do |file| %>
           <%# herb:key file.id %>
           <li>
-            <%= link_to file.filename.to_s, rails_blob_path(file, disposition: "attachment"), class: "link" %>
-            <span class="text-small text-muted"><%= number_to_human_size(file.byte_size) %><%= " · " + file.metadata["field"].to_s if file.metadata["field"].present? %></span>
+            <%= link_to file.filename.to_s, rails_blob_path(file, disposition: "attachment") %>
+            <span class="small muted"><%= number_to_human_size(file.byte_size) %><%= " · " + file.metadata["field"].to_s if file.metadata["field"].present? %></span>
           </li>
         <% end %>
       </ul>

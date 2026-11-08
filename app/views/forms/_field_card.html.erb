@@ -4,39 +4,25 @@
     the site shows it (drawn by the builder from its settings). Picked, its
     settings open in the sheet (forms/_field_sheet); the hidden _row comes
     first so the row posts in the list's order. %>
-<% tool_classes = "btn btn--plain btn--icon" %>
 <li class="form-card" tabindex="0" draggable="true" data-key="<%= key %>" data-forms--builder-target="card"
     data-action="click->forms--builder#pick keydown.enter->forms--builder#pick">
   <%= hidden_field_tag "form[fields][" + key + "][_row]", "", id: nil %>
   <div class="form-card__header">
     <span class="drag-handle" title="Drag to reorder" aria-hidden="true">⠿</span>
-    <span class="row row--baseline grow">
-      <span class="no-shrink text-medium text-ink" data-role="kind"></span>
-      <code class="truncate text-mono text-small text-muted" data-role="name"></code>
+    <span class="form-card__title">
+      <span class="strong" data-role="kind"></span>
+      <code class="truncate muted" data-role="name"></code>
     </span>
     <span class="row-moves">
-      <button type="button" class="<%= tool_classes %>" title="Settings" data-action="forms--builder#pick">
-        <%= icon_tag "settings-outline" %>
-        <span class="visually-hidden">Field settings</span>
-      </button>
-      <button type="button" class="<%= tool_classes %>" title="Move up" data-action="forms--builder#moveUp">
-        <%= icon_tag "arrow-up" %>
-        <span class="visually-hidden">Move up</span>
-      </button>
-      <button type="button" class="<%= tool_classes %>" title="Move down" data-action="forms--builder#moveDown">
+      <%= icon_button "settings-outline", label: "Field settings", data: { action: "forms--builder#pick" } %>
+      <%= icon_button "arrow-up", label: "Move up", data: { action: "forms--builder#moveUp" } %>
+      <button type="button" class="icon-button" title="Move down" aria-label="Move down" data-action="forms--builder#moveDown">
         <%= icon_tag "arrow-up", class: "row-moves__down" %>
-        <span class="visually-hidden">Move down</span>
       </button>
       <span class="row-moves__extra">
-        <button type="button" class="<%= tool_classes %>" title="Duplicate" data-action="forms--builder#duplicate">
-          <%= icon_tag "copy-paste" %>
-          <span class="visually-hidden">Duplicate</span>
-        </button>
+        <%= icon_button "copy-paste", label: "Duplicate", data: { action: "forms--builder#duplicate" } %>
       </span>
-      <button type="button" class="btn btn--plain btn--icon row-moves__remove" title="Delete" data-action="forms--builder#remove">
-        <%= icon_tag "trash" %>
-        <span class="visually-hidden">Delete</span>
-      </button>
+      <%= icon_button "trash", label: "Delete", class: "icon-button--danger row-moves__remove", data: { action: "forms--builder#remove" } %>
     </span>
   </div>
   <div class="form-card__preview" data-role="preview"></div>

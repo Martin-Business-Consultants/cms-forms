@@ -2,53 +2,58 @@
 <%# The New form sheet: a title, a slug, a status, and optionally a template
     whose fields it starts with. It opens by itself at /forms/new (the menus
     link there) and when a submit came back with errors. %>
-<div class="contents" data-controller="dialog" data-dialog-modal-value="true" data-dialog-auto-open-value="<%= open %>" data-action="keydown.esc->dialog#close:stop">
-  <button type="button" class="btn" data-keys="n" data-action="dialog#open">
+<div class="contents" data-controller="rune-dialog" data-rune-dialog-auto-open-value="<%= open %>" data-action="keydown.esc->rune-dialog#close:stop">
+  <button type="button" class="btn btn--secondary" data-keys="n" data-action="rune-dialog#open">
     <%= icon_tag "add" %>
     <span class="truncate">New form</span>
-    <kbd class="wide-only">N</kbd>
+    <kbd>N</kbd>
   </button>
-  <dialog class="dialog dialog--sheet" data-dialog-target="dialog" aria-label="New form" closedby="any">
-    <h2 class="heading heading--lg">New form</h2>
-    <%= render "layouts/shared/errors", record: form_record %>
-    <%= form_with model: form_record, url: forms_path, class: "fields" do |form| %>
-      <label class="field">
-        <span class="label">Title</span>
-        <%= form.text_field :title, placeholder: "Get in touch", autocomplete: "off" %>
-      </label>
-      <label class="field">
-        <span class="label">Slug</span>
-        <%= form.text_field :slug, class: "text-mono", placeholder: "contact", autocomplete: "off", spellcheck: false %>
-        <span class="help">The site posts to <code class="code">/api/forms/&lt;slug&gt;/submissions</code>, so it can’t change later. A template fills title and slug in when left blank.</span>
-      </label>
-      <label class="field">
-        <span class="label">Status</span>
-        <%= form.select :status, form_status_options %>
-        <span class="help">Only a published form takes submissions.</span>
-      </label>
-
-      <fieldset class="stack stack--sm">
-        <legend class="label">Start from</legend>
-        <label class="template-choice">
-          <%= radio_button_tag :template, "", params[:template].blank?, id: nil %>
-          <span>No fields yet — I’ll add them</span>
+  <dialog class="dialog sheet" data-rune-dialog-target="dialog" data-action="click->rune-dialog#backdrop" aria-label="New form" closedby="any">
+    <div class="dialog__box">
+      <header class="dialog__header">
+        <h2 class="dialog__title">New form</h2>
+        <%= icon_button "close", label: "Close", data: { action: "rune-dialog#close" } %>
+      </header>
+      <%= render "layouts/shared/errors", record: form_record %>
+      <%= form_with model: form_record, url: forms_path, class: "stack" do |form| %>
+        <label class="field">
+          <span class="field__label">Title</span>
+          <%= form.text_field :title, placeholder: "Get in touch", autocomplete: "off" %>
         </label>
-        <% Form::TEMPLATES.each do |template| %>
-          <%# herb:key template[:key] %>
-          <label class="template-choice">
-            <%= radio_button_tag :template, template[:key], params[:template] == template[:key], id: nil %>
-            <span class="stack stack--2xs">
-              <strong class="text-medium text-ink"><%= template[:name] %></strong>
-              <span class="help"><%= template[:description] %> · <%= pluralize(template[:fields].size, "field") %></span>
-            </span>
-          </label>
-        <% end %>
-      </fieldset>
+        <label class="field">
+          <span class="field__label">Slug</span>
+          <%= form.text_field :slug, class: "mono", placeholder: "contact", autocomplete: "off", spellcheck: false %>
+          <span class="field__hint">The site posts to <code>/api/forms/&lt;slug&gt;/submissions</code>, so it can’t change later. A template fills title and slug in when left blank.</span>
+        </label>
+        <label class="field">
+          <span class="field__label">Status</span>
+          <%= form.select :status, form_status_options %>
+          <span class="field__hint">Only a published form takes submissions.</span>
+        </label>
 
-      <div class="dialog__actions">
-        <button type="button" class="btn" data-action="dialog#close">Cancel</button>
-        <%= form.button "Create form", class: "btn btn--primary" %>
-      </div>
-    <% end %>
+        <fieldset class="stack stack--sm">
+          <legend>Start from</legend>
+          <label class="template-choice">
+            <%= radio_button_tag :template, "", params[:template].blank?, id: nil %>
+            <span>No fields yet — I’ll add them</span>
+          </label>
+          <% Form::TEMPLATES.each do |template| %>
+            <%# herb:key template[:key] %>
+            <label class="template-choice">
+              <%= radio_button_tag :template, template[:key], params[:template] == template[:key], id: nil %>
+              <span class="stack stack--xs">
+                <strong><%= template[:name] %></strong>
+                <span class="field__hint"><%= template[:description] %> · <%= pluralize(template[:fields].size, "field") %></span>
+              </span>
+            </label>
+          <% end %>
+        </fieldset>
+
+        <div class="dialog__actions">
+          <button type="button" class="btn btn--ghost" data-action="rune-dialog#close">Cancel</button>
+          <%= form.button "Create form", class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    </div>
   </dialog>
 </div>
